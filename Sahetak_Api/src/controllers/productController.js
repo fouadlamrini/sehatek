@@ -1,10 +1,13 @@
-const fs = require("fs");
-const path = require("path");
-
 const Product = require("../models/Product");
 const Promotion = require("../models/Promotion");
 const AppError = require("../utils/AppError");
-const { calculatePromotionPrice } = require("../utils/pricingService");
+const {
+  calculatePromotionPrice,
+} = require("../utils/pricingService");
+const {
+  uploadProductImage,
+  deleteCloudinaryImage,
+} = require("../utils/cloudinaryService");
 
 // =========================
 // PROMOTION VIEW HELPERS
@@ -41,13 +44,27 @@ const createProduct = async (req, res, next) => {
   try {
     const { name, mealDays, price, stock } = req.body;
 
-    const product = await Product.create({
-      name,
-      image: `/uploads/products/${req.file.filename}`,
-      mealDays,
-      price: Number(price),
-      stock: Number(stock),
-    });
+    // The image arrives via multer (memoryStorage) as req.file.buffer.
+    const uploaded = await uploadProductImage(req.file.buffer);
+
+    let product;
+
+    try {
+      product = await Product.create({
+        name,
+        image: uploaded.url,
+        publicId: uploaded.publicId,
+        mealDays,
+        price: Number(price),
+        stock: Number(stock),
+      });
+    } catch (error) {
+      // DB failed -> roll back the freshly uploaded Cloudinary image so we do
+      // not leave an orphan asset, then delegate to the centralized handler.
+      await deleteCloudinaryImage(uploaded.publicId).catch(() => {});
+
+      throw error;
+    }
 
     return res.status(201).json({
       success: true,
@@ -55,19 +72,6 @@ const createProduct = async (req, res, next) => {
       data: product,
     });
   } catch (error) {
-    // Delete uploaded image if database creation fails
-    if (req.file) {
-      const filePath = path.join(
-        __dirname,
-        "../uploads/products",
-        req.file.filename
-      );
-
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
-    }
-
     // Duplicate product (name + mealDays + price already exists)
     if (error && error.code === 11000) {
       return next(
@@ -160,30 +164,12 @@ const updateProduct = async (req, res, next) => {
     const product = await Product.findById(req.params.id);
 
     if (!product) {
-      // If a new image was uploaded, delete it
-      if (req.file) {
-        const newImagePath = path.join(
-          __dirname,
-          "../uploads/products",
-          req.file.filename
-        );
-
-        if (fs.existsSync(newImagePath)) {
-          fs.unlinkSync(newImagePath);
-        }
-      }
-
       throw new AppError("Product not found", 404);
     }
 
-    const oldImage = product.image;
+    const oldPublicId = product.publicId;
 
-    const {
-      name,
-      mealDays,
-      price,
-      stock,
-    } = req.body;
+    const { name, mealDays, price, stock } = req.body;
 
     if (name !== undefined) {
       product.name = name;
@@ -201,26 +187,31 @@ const updateProduct = async (req, res, next) => {
       product.stock = Number(stock);
     }
 
-    // New image uploaded
+    // New image uploaded: upload to Cloudinary FIRST. The old image is only
+    // deleted AFTER the database successfully references the new one.
+    let uploaded = null;
+
     if (req.file) {
-      product.image = `/uploads/products/${req.file.filename}`;
+      uploaded = await uploadProductImage(req.file.buffer);
+
+      product.image = uploaded.url;
+      product.publicId = uploaded.publicId;
     }
 
-    await product.save();
-
-    // Delete old image after successful database update
-    if (req.file && oldImage) {
-      const oldImageName = path.basename(oldImage);
-
-      const oldImagePath = path.join(
-        __dirname,
-        "../uploads/products",
-        oldImageName
-      );
-
-      if (fs.existsSync(oldImagePath)) {
-        fs.unlinkSync(oldImagePath);
+    try {
+      await product.save();
+    } catch (error) {
+      // DB failed -> roll back the newly uploaded Cloudinary image.
+      if (uploaded) {
+        await deleteCloudinaryImage(uploaded.publicId).catch(() => {});
       }
+
+      throw error;
+    }
+
+    // DB now references the new image, so the old image can be deleted safely.
+    if (uploaded && oldPublicId) {
+      await deleteCloudinaryImage(oldPublicId);
     }
 
     return res.status(200).json({
@@ -229,17 +220,13 @@ const updateProduct = async (req, res, next) => {
       data: product,
     });
   } catch (error) {
-    // Delete newly uploaded image if update failed
-    if (req.file) {
-      const newImagePath = path.join(
-        __dirname,
-        "../uploads/products",
-        req.file.filename
+    if (error && error.code === 11000) {
+      return next(
+        new AppError(
+          "A product with the same name, meal days and price already exists",
+          409
+        )
       );
-
-      if (fs.existsSync(newImagePath)) {
-        fs.unlinkSync(newImagePath);
-      }
     }
 
     next(error);
@@ -258,24 +245,14 @@ const deleteProduct = async (req, res, next) => {
       throw new AppError("Product not found", 404);
     }
 
-    const image = product.image;
+    // Delete the Cloudinary image first (already-deleted assets are ignored),
+    // then remove the document. Deleting the document directly in MongoDB
+    // bypasses this endpoint and cannot trigger the Cloudinary deletion.
+    if (product.publicId) {
+      await deleteCloudinaryImage(product.publicId);
+    }
 
     await Product.findByIdAndDelete(req.params.id);
-
-    // Delete image
-    if (image) {
-      const imageName = path.basename(image);
-
-      const imagePath = path.join(
-        __dirname,
-        "../uploads/products",
-        imageName
-      );
-
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
-      }
-    }
 
     return res.status(200).json({
       success: true,

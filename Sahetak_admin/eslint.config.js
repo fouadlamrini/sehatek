@@ -17,5 +17,16 @@ export default defineConfig([
       globals: globals.browser,
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
+    rules: {
+      // Fetching data on mount legitimately updates state from an effect.
+      'react-hooks/set-state-in-effect': 'off',
+    },
+  },
+  {
+    // Context modules intentionally export their provider and context object.
+    files: ['src/context/**/*.jsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
   },
 ])

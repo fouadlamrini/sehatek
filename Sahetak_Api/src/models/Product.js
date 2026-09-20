@@ -13,6 +13,16 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
 
+    // Cloudinary public_id of the product image. Used to delete the asset
+    // from Cloudinary when the product is updated with a new image or deleted.
+    // Legacy products created before the Cloudinary migration have no
+    // publicId and keep their old image URL untouched.
+    publicId: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+
     mealDays: {
       type: [String],
       required: true,
