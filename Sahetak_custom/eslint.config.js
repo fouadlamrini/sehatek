@@ -17,5 +17,15 @@ export default defineConfig([
       globals: globals.browser,
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
+    rules: {
+      // State is intentionally synced inside effects (data fetching / media queries).
+      'react-hooks/set-state-in-effect': 'off',
+    },
+  },
+  {
+    files: ['src/context/**/*.{js,jsx}'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
   },
 ])
