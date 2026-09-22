@@ -26,8 +26,9 @@ const app = express();
 // Security headers
 app.use(
   helmet({
-    // Allow uploaded images to be loaded from other origins
+    // Allow resources from other origins
     crossOriginResourcePolicy: { policy: "cross-origin" },
+
     // API does not serve HTML
     contentSecurityPolicy: false,
   })
@@ -36,22 +37,30 @@ app.use(
 // CORS
 app.use(cors(corsOptions));
 
-// HTTP request logging (morgan -> winston)
+// HTTP request logging
 app.use(requestLogger);
 
+// Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Rate limiting for all API requests
 app.use("/api", apiLimiter);
 
-// Static files
-app.use("/uploads", express.static("src/uploads"));
+// =========================
+// HEALTH CHECK
+// =========================
+
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Sahetak API is running",
+  });
+});
 
 // =========================
 // ROUTES
 // =========================
-
 
 app.use("/api/auth", authRoutes);
 app.use("/api/admins", adminRoutes);
@@ -76,7 +85,7 @@ app.use((req, res, next) => {
 });
 
 // =========================
-// CENTRAL ERROR HANDLER (MUST BE LAST)
+// CENTRAL ERROR HANDLER
 // =========================
 
 app.use(errorMiddleware);
