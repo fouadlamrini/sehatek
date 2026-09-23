@@ -13,6 +13,7 @@ import Orders from "../pages/orders/Orders";
 import Admins from "../pages/admins/Admins";
 import CreateAdmin from "../pages/admins/CreateAdmin";
 import Profile from "../pages/profile/Profile";
+import Settings from "../pages/settings/Settings";
 import NotFound from "../pages/NotFound";
 
 const AppRoutes = () => (
@@ -29,6 +30,7 @@ const AppRoutes = () => (
         <Route path="/packs" element={<Packs />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/settings" element={<Settings />} />
 
         <Route element={<RoleRoute role="super_admin" />}>
           <Route path="/admins" element={<Admins />} />

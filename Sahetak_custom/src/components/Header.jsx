@@ -1,9 +1,15 @@
 import { useState } from 'react';
 import Sahetak from '../assets/sahetak.png';
 import Plats from '../assets/plats.jpeg';
+import { useSiteSettings } from '../hooks/useSiteSettings';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const settings = useSiteSettings();
+
+  // Admin-managed images fall back to the packaged defaults.
+  const bannerImage = settings?.bannerImage?.url || Plats;
+  const profileImage = settings?.profileImage?.url || Sahetak;
 
   return (
     <>
@@ -32,7 +38,7 @@ const Header = () => {
           "
         >
           <img
-            src={Plats}
+            src={bannerImage}
             alt="Banner"
             className="
               w-full
@@ -114,7 +120,7 @@ const Header = () => {
               "
             >
               <img
-                src={Sahetak}
+                src={profileImage}
                 alt="Profile"
                 className="
                   w-full
@@ -239,7 +245,7 @@ const Header = () => {
             {/* ========================= */}
 
             <img
-              src={Plats}
+              src={bannerImage}
               alt="Banner Full"
               className="
                 w-full

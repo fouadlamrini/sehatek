@@ -1,5 +1,6 @@
 import {
   ClipboardList,
+  Image as ImageIcon,
   LayoutDashboard,
   Package,
   Percent,
@@ -44,6 +45,12 @@ export const NAV_ITEMS = [
       { label: "Admins list", to: "/admins" },
       { label: "Create admin", to: "/admins/create" },
     ],
+  },
+  {
+    type: "link",
+    label: "Site settings",
+    to: "/settings",
+    icon: ImageIcon,
   },
   {
     type: "link",

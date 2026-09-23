@@ -133,8 +133,6 @@ const Products = () => {
     <div className="min-h-screen bg-gray-50 pb-16">
       <SiteHeader itemsCount={itemsCount} />
 
-      <OrderProgress current={0} />
-
       <Header />
 
       <div className="mx-auto max-w-4xl space-y-6 p-4 sm:p-6">
@@ -143,6 +141,8 @@ const Products = () => {
             Menu de la Semaine
           </h2>
         </div>
+
+        <OrderProgress current={0} />
 
         {loading ? (
           <div className="flex flex-col items-center gap-3 py-16">
