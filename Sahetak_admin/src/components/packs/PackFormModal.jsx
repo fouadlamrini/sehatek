@@ -53,12 +53,26 @@ const PackFormModal = ({ open, onClose, pack, products, onSaved }) => {
   }, [open, pack]);
 
   const toggleProduct = (id) => {
-    setForm((current) => ({
-      ...current,
-      products: current.products.includes(id)
-        ? current.products.filter((item) => item !== id)
-        : [...current.products, id],
-    }));
+    setForm((current) => {
+      const selected = current.products.includes(id);
+
+      // Never allow adding an out-of-stock product to a pack (removing an
+      // already-selected one stays possible).
+      if (!selected) {
+        const product = products.find((item) => item._id === id);
+
+        if (product && Number(product.stock) <= 0) {
+          return current;
+        }
+      }
+
+      return {
+        ...current,
+        products: selected
+          ? current.products.filter((item) => item !== id)
+          : [...current.products, id],
+      };
+    });
   };
 
   const validate = () => {
@@ -182,17 +196,22 @@ const PackFormModal = ({ open, onClose, pack, products, onSaved }) => {
             <div className="grid max-h-56 grid-cols-1 gap-2 overflow-y-auto rounded-lg border border-gray-200 p-2 sm:grid-cols-2">
               {products.map((product) => {
                 const selected = form.products.includes(product._id);
+                const outOfStock = Number(product.stock) <= 0;
+                const disabled = outOfStock && !selected;
 
                 return (
                   <button
                     key={product._id}
                     type="button"
                     onClick={() => toggleProduct(product._id)}
+                    disabled={disabled}
+                    title={outOfStock ? "Out of stock - cannot be added" : undefined}
                     className={cn(
                       "flex items-center gap-3 rounded-lg border px-3 py-2 text-left transition",
                       selected
                         ? "border-primary bg-primary-soft"
-                        : "border-gray-200 hover:border-primary/50"
+                        : "border-gray-200 hover:border-primary/50",
+                      disabled && "cursor-not-allowed opacity-50 hover:border-gray-200"
                     )}
                   >
                     <span
@@ -215,6 +234,12 @@ const PackFormModal = ({ open, onClose, pack, products, onSaved }) => {
                     <span className="min-w-0 flex-1 truncate text-sm font-medium text-gray-700">
                       {product.name}
                     </span>
+
+                    {outOfStock ? (
+                      <span className="shrink-0 rounded bg-red-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-red-600">
+                        Rupture
+                      </span>
+                    ) : null}
                   </button>
                 );
               })}

@@ -1,4 +1,5 @@
 const Pack = require("../models/Pack");
+const Product = require("../models/Product");
 const AppError = require("../utils/AppError");
 
 const { validatePackProducts } = require("../utils/pricingService");
@@ -6,6 +7,21 @@ const { validatePackProducts } = require("../utils/pricingService");
 // Order-independent key for an exact combination of products.
 const buildCombinationKey = (productIds) =>
   productIds.map(String).sort().join("|");
+
+// Reject packs that contain at least one out-of-stock product.
+const assertProductsInStock = async (products) => {
+  const inStock = await Product.countDocuments({
+    _id: { $in: products },
+    stock: { $gt: 0 },
+  });
+
+  if (inStock !== products.length) {
+    throw new AppError(
+      "A pack cannot contain an out-of-stock product",
+      400
+    );
+  }
+};
 
 // =========================
 // CREATE PACK
@@ -17,6 +33,9 @@ const createPack = async (req, res, next) => {
 
     // Products must exist (non-empty + unique is validated by middleware).
     await validatePackProducts(products);
+
+    // No out-of-stock product may be bundled into a pack.
+    await assertProductsInStock(products);
 
     // Percentage value must stay within 0-100 (defense in depth, mirrors the
     // express-validator check and updatePack).
@@ -126,6 +145,9 @@ const updatePack = async (req, res, next) => {
 
     if (products !== undefined) {
       await validatePackProducts(products);
+
+      // No out-of-stock product may be bundled into a pack.
+      await assertProductsInStock(products);
 
       // No other Pack may share the new combination (active or inactive).
       const conflicting = await Pack.findOne({

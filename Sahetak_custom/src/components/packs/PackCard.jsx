@@ -13,8 +13,18 @@ const PackCard = ({ pack, onAdd, onImageClick }) => {
   const { originalTotal, finalPrice, discount } = computePackPrice(pack);
   const image = products[0]?.image;
 
+  // A pack is unavailable as soon as one of its products is out of stock.
+  const unavailable = products.some(
+    (product) => Number(product.stock) <= 0
+  );
+
   return (
-    <article className="flex flex-col overflow-hidden rounded-2xl border border-leaf/30 bg-white shadow-sm">
+    <article
+      className={cn(
+        "flex flex-col overflow-hidden rounded-2xl border bg-white shadow-sm",
+        unavailable ? "border-gray-200 opacity-60" : "border-leaf/30"
+      )}
+    >
       <div className="relative">
         <button
           type="button"
@@ -36,7 +46,11 @@ const PackCard = ({ pack, onAdd, onImageClick }) => {
           Pack
         </span>
 
-        {discount > 0 ? (
+        {unavailable ? (
+          <span className="absolute right-2 top-2 rounded-full bg-red-600 px-2.5 py-1 text-xs font-extrabold text-white shadow-md">
+            Indisponible
+          </span>
+        ) : discount > 0 ? (
           <span className="absolute right-2 top-2 rounded-full bg-primary px-2.5 py-1 text-xs font-extrabold text-white shadow-md">
             -{formatCurrency(discount)}
           </span>
@@ -89,8 +103,15 @@ const PackCard = ({ pack, onAdd, onImageClick }) => {
                   ) : null}
                 </div>
 
-                <span className="text-xs font-bold text-forest">
-                  {formatCurrency(product.price)}
+                <span
+                  className={cn(
+                    "text-xs font-bold",
+                    Number(product.stock) <= 0 ? "text-red-500" : "text-forest"
+                  )}
+                >
+                  {Number(product.stock) <= 0
+                    ? "Rupture"
+                    : formatCurrency(product.price)}
                 </span>
               </li>
             ))}
@@ -101,10 +122,11 @@ const PackCard = ({ pack, onAdd, onImageClick }) => {
           variant="leaf"
           size="sm"
           icon={Plus}
+          disabled={unavailable}
           onClick={() => onAdd(pack)}
           className="mt-3 w-full"
         >
-          Ajouter le pack
+          {unavailable ? "Indisponible" : "Ajouter le pack"}
         </Button>
       </div>
     </article>
