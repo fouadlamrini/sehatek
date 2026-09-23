@@ -9,6 +9,11 @@ const apiLimiter = rateLimit({
   max: Number(process.env.RATE_LIMIT_MAX_API) || 300,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: {
+    // The app sets "trust proxy", so the header is honored for req.ip;
+    // this just silences express-rate-limit's own validation warnings.
+    xForwardedForHeader: false,
+  },
   message: {
     message: "Too many requests, please try again later",
   },
@@ -26,6 +31,9 @@ const authLimiter = rateLimit({
       : Number(process.env.RATE_LIMIT_MAX_AUTH_DEV) || 100,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: {
+    xForwardedForHeader: false,
+  },
   message: {
     message: "Too many attempts, please try again later",
   },
@@ -40,6 +48,9 @@ const orderLimiter = rateLimit({
   max: Number(process.env.RATE_LIMIT_MAX_ORDER) || 30,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: {
+    xForwardedForHeader: false,
+  },
   message: {
     message: "Too many order requests, please try again later",
   },

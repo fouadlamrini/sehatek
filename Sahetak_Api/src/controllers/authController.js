@@ -98,14 +98,39 @@ const changePassword = async (req, res, next) => {
       throw new AppError("Current password is incorrect", 401);
     }
 
-    // Change password
+    // Change password and bump the token version so every previously issued
+    // access/refresh token is immediately rejected (revokes other sessions).
     admin.password = newPassword;
+    admin.tokenVersion = (admin.tokenVersion ?? 0) + 1;
 
     await admin.save();
+
+    // Invalidate all stored refresh tokens, then issue a fresh pair so the
+    // current session keeps working.
+    await RefreshToken.deleteMany({ admin: admin._id });
+
+    const token = generateToken(admin);
+    const refreshToken = generateRefreshToken(admin);
+
+    await RefreshToken.create({
+      admin: admin._id,
+      token: hashToken(refreshToken),
+      expiresAt: getTokenExpiry(refreshToken),
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
     return res.status(200).json({
       success: true,
       message: "Password changed successfully",
+      data: {
+        token,
+      },
     });
   } catch (error) {
     next(error);
@@ -176,7 +201,8 @@ const getProfile = async (req, res, next) => {
 const logout = async (req, res, next) => {
   try {
     const token = req.token;
-    const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
+    // Only the httpOnly cookie is trusted for revocation — never the body.
+    const refreshToken = req.cookies.refreshToken;
 
     // Revoke the refresh token (hashed) if provided
     if (refreshToken) {
@@ -198,12 +224,12 @@ const logout = async (req, res, next) => {
       ? new Date(decoded.exp * 1000)
       : new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    // Blacklist the access token so it can no longer be used
+    // Blacklist the access token hash so it can no longer be used
     await BlacklistedToken.updateOne(
-      { token },
+      { token: hashToken(token) },
       {
         $setOnInsert: {
-          token,
+          token: hashToken(token),
           expiresAt,
         },
       },
@@ -225,18 +251,32 @@ const logout = async (req, res, next) => {
 
 const refresh = async (req, res, next) => {
   try {
-    // Prefer the refresh token from the httpOnly cookie (fallback: JSON body)
-    const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
+    // Only the httpOnly cookie is accepted — never the JSON body.
+    const refreshToken = req.cookies.refreshToken;
 
-    // Verify refresh token signature
+    const clearCookie = () => {
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+      });
+    };
+
+    if (!refreshToken) {
+      throw new AppError("Invalid refresh token", 401);
+    }
+
+    // Verify refresh token signature (algorithm pinned)
     let payload;
 
     try {
       payload = jwt.verify(
         refreshToken,
-        process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET
+        process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET,
+        { algorithms: ["HS256"] }
       );
     } catch {
+      clearCookie();
       throw new AppError("Invalid refresh token", 401);
     }
 
@@ -246,11 +286,13 @@ const refresh = async (req, res, next) => {
     });
 
     if (!stored) {
+      clearCookie();
       throw new AppError("Invalid refresh token", 401);
     }
 
     if (stored.expiresAt < new Date()) {
       await stored.deleteOne();
+      clearCookie();
 
       throw new AppError("Refresh token has expired", 401);
     }
@@ -259,6 +301,15 @@ const refresh = async (req, res, next) => {
 
     if (!admin) {
       await stored.deleteOne();
+      clearCookie();
+
+      throw new AppError("Invalid refresh token", 401);
+    }
+
+    // Token version: bumped on password change
+    if ((payload.v ?? 0) !== (admin.tokenVersion ?? 0)) {
+      await stored.deleteOne();
+      clearCookie();
 
       throw new AppError("Invalid refresh token", 401);
     }

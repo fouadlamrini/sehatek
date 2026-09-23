@@ -4,7 +4,18 @@ const allowedOrigins = (process.env.CORS_ORIGIN || "*")
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-const allowAll = allowedOrigins.includes("*");
+let allowAll = allowedOrigins.includes("*");
+
+// Reflecting any origin while sending credentials turns CORS into an open
+// relay for the refresh-token cookie. Ignore the wildcard and fall back to
+// the explicit allowlist (or no-origin requests only) when it is present.
+if (allowAll) {
+  // eslint-disable-next-line no-console
+  console.warn(
+    '[cors] CORS_ORIGIN contains "*" with credentials enabled; ignoring the wildcard.'
+  );
+  allowAll = false;
+}
 
 const corsOptions = {
   origin: (origin, callback) => {

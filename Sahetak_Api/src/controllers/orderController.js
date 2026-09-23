@@ -1,6 +1,7 @@
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 const AppError = require("../utils/AppError");
+const { signTrackToken, verifyTrackToken } = require("../utils/trackToken");
 
 const {
   calculateCartPrice,
@@ -16,55 +17,68 @@ const createOrder = async (req, res, next) => {
     const { items, customer, delivery } = req.body;
 
     // =========================
-    // PROCESS ITEMS
+    // PROCESS ITEMS (single batch fetch, no N+1)
     // =========================
 
-    const processedItems = [];
+    const productIds = items.map((item) => item.product);
+
+    const products = await Product.find({ _id: { $in: productIds } });
+    const productMap = new Map(
+      products.map((product) => [String(product._id), product])
+    );
+
+    // Aggregated quantity per product across every meal day
+    const neededPerProduct = new Map();
 
     for (const item of items) {
-      const { product, mealDay, quantity, note } = item;
-
-      // Find product
-      const productData = await Product.findById(product);
+      const productData = productMap.get(String(item.product));
 
       if (!productData) {
-        throw new AppError(`Product not found: ${product}`, 404);
+        throw new AppError(`Product not found: ${item.product}`, 404);
       }
 
       // =========================
       // CHECK MEAL DAY
       // =========================
 
-      if (!productData.mealDays.includes(mealDay)) {
+      if (!productData.mealDays.includes(item.mealDay)) {
         throw new AppError(
-          `${productData.name} is not available on ${mealDay}`,
+          `${productData.name} is not available on ${item.mealDay}`,
           400
         );
       }
 
-      // =========================
-      // CHECK STOCK
-      // =========================
-
-      if (productData.stock < quantity) {
-        throw new AppError(
-          `Not enough stock for ${productData.name}`,
-          400
-        );
-      }
-
-      // =========================
-      // PRICE
-      // =========================
-
-      processedItems.push({
-        product: productData._id,
-        mealDay,
-        quantity: Number(quantity),
-        price: productData.price,
-        note: note || "",
-      });
+      neededPerProduct.set(
+        String(productData._id),
+        (neededPerProduct.get(String(productData._id)) ?? 0) +
+          Number(item.quantity)
+      );
     }
+
+    // =========================
+    // CHECK STOCK (cumulative across the whole order)
+    // =========================
+
+    for (const [productId, needed] of neededPerProduct) {
+      if (productMap.get(productId).stock < needed) {
+        throw new AppError(
+          `Not enough stock for ${productMap.get(productId).name}`,
+          400
+        );
+      }
+    }
+
+    const processedItems = items.map((item) => {
+      const productData = productMap.get(String(item.product));
+
+      return {
+        product: productData._id,
+        mealDay: item.mealDay,
+        quantity: Number(item.quantity),
+        price: productData.price,
+        note: item.note || "",
+      };
+    });
 
     // =========================
     // PRICING (Promotion / Pack)
@@ -161,9 +175,22 @@ const getGuestOrder = async (req, res, next) => {
       success: true,
       message: "Order retrieved successfully",
       data: order,
+      // Signed, short-lived capability for mutations — never reveal it in URLs.
+      trackToken: signTrackToken({
+        orderId: order._id,
+        phone: order.customer.phone,
+      }),
     });
   } catch (error) {
     next(error);
+  }
+};
+
+const assertTrackToken = (req, order) => {
+  const { trackToken } = req.body;
+
+  if (!verifyTrackToken(trackToken, { orderId: order._id, phone: order.customer.phone })) {
+    throw new AppError("Invalid or expired track token", 401);
   }
 };
 
@@ -172,6 +199,10 @@ const cancelGuestOrder = async (req, res, next) => {
     const { trackingCode, phone } = req.body;
 
     const order = await getOrderByTracking(trackingCode, phone);
+
+    // The (code + phone) pair alone is no longer enough: the short-lived
+    // signed token obtained from /orders/track must be presented.
+    assertTrackToken(req, order);
 
     // Only pending orders can be cancelled by the guest
     if (order.status !== "pending") {
@@ -213,6 +244,9 @@ const updateGuestOrder = async (req, res, next) => {
 
     const order = await getOrderByTracking(trackingCode, phone);
 
+    // Require the signed capability issued at /orders/track
+    assertTrackToken(req, order);
+
     // Only pending orders can be updated by the guest
     if (order.status !== "pending") {
       throw new AppError(
@@ -249,10 +283,18 @@ const updateGuestOrder = async (req, res, next) => {
 
     await order.save();
 
+    // Re-issue a fresh capability bound to the (possibly new) phone so the
+    // customer can continue managing the order without re-typing the phone.
+    const nextTrackToken = signTrackToken({
+      orderId: order._id,
+      phone: order.customer.phone,
+    });
+
     return res.status(200).json({
       success: true,
       message: "Order updated successfully",
       data: order,
+      trackToken: nextTrackToken,
     });
   } catch (error) {
     next(error);

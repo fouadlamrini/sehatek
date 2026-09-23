@@ -17,8 +17,8 @@ const createAdminValidator = [
   body("password")
     .notEmpty()
     .withMessage("Password is required")
-    .isLength({ min: 6 })
-    .withMessage("Password must contain at least 6 characters"),
+    .isLength({ min: 8 })
+    .withMessage("Password must contain at least 8 characters"),
 ];
 
 const deleteAdminValidator = [

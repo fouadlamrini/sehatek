@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const crypto = require("crypto");
 
 const orderItemSchema = require("./OrderItem");
 const customerSchema = require("./Customer");
@@ -11,8 +12,15 @@ const orderSchema = new mongoose.Schema(
       required: true,
       unique: true,
       trim: true,
+      // Cryptographically random 10-character suffix (~1 quadrillion combos),
+      // so the code + phone pair is effectively unguessable.
       default: () =>
-        "STK-" + Math.random().toString(36).substring(2, 7).toUpperCase(),
+        "STK-" +
+        Array.from(crypto.randomBytes(6))
+          .map((byte) => byte.toString(16).padStart(2, "0"))
+          .join("")
+          .slice(0, 10)
+          .toUpperCase(),
     },
 
     items: {

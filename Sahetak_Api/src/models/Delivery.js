@@ -5,12 +5,14 @@ const deliverySchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
+    maxlength: 60,
   },
 
   quartier: {
     type: String,
     required: true,
     trim: true,
+    maxlength: 100,
   },
 
   locationType: {
@@ -23,6 +25,7 @@ const deliverySchema = new mongoose.Schema({
     type: String,
     default: "",
     trim: true,
+    maxlength: 60,
   },
 });
 

@@ -13,7 +13,6 @@ const {
   loginValidator,
   changePasswordValidator,
   changeNameValidator,
-  refreshTokenValidator,
 } = require("../validators/authValidator");
 
 const validate = require("../middleware/validationMiddleware");
@@ -24,7 +23,7 @@ const router = express.Router();
 
 // Public
 router.post("/login", authLimiter, loginValidator, validate, login);
-router.post("/refresh", authLimiter, refreshTokenValidator, validate, refresh);
+router.post("/refresh", authLimiter, refresh);
 
 // Protected
 router.patch(

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   AlertTriangle,
@@ -53,12 +53,15 @@ const TrackOrder = () => {
 
   const [form, setForm] = useState({
     trackingCode: searchParams.get("code") || "",
-    phone: searchParams.get("phone") || "",
+    phone: "",
   });
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState("");
 
   const [order, setOrder] = useState(null);
+  // Short-lived capability for update/cancel, kept only in memory (never in
+  // the URL and never persisted) and refreshed after every successful track.
+  const [trackToken, setTrackToken] = useState(null);
   const [actionError, setActionError] = useState("");
 
   const [editing, setEditing] = useState(false);
@@ -85,17 +88,19 @@ const TrackOrder = () => {
     setActionError("");
 
     try {
-      const { data } = await orderApi.trackOrder(
+      const { data, trackToken: nextToken } = await orderApi.trackOrder(
         form.trackingCode.trim(),
         form.phone.trim()
       );
 
       setOrder(data);
+      setTrackToken(nextToken);
       setEditForm(emptyFields(data));
       setCancelArmed(false);
       setEditing(false);
     } catch (err) {
       setOrder(null);
+      setTrackToken(null);
       setSearchError(
         getErrorMessage(err, "Commande introuvable. Vérifiez vos informations.")
       );
@@ -104,21 +109,9 @@ const TrackOrder = () => {
     }
   }, [form]);
 
-  // Auto-search when the success page links here with code + phone.
-  const didAutoSearch = useRef(false);
-
-  useEffect(() => {
-    if (!didAutoSearch.current) {
-      didAutoSearch.current = true;
-
-      if (form.trackingCode && form.phone) {
-        handleSearch();
-      }
-    }
-  }, [handleSearch, form]);
-
   const handleNewSearch = () => {
     setOrder(null);
+    setTrackToken(null);
     setEditing(false);
     setCancelArmed(false);
     setActionError("");
@@ -144,8 +137,9 @@ const TrackOrder = () => {
     setActionError("");
 
     try {
-      const { data } = await orderApi.updateOrder({
+      const { data, trackToken: nextToken } = await orderApi.updateOrder({
         trackingCode: order.trackingCode,
+        trackToken,
         // Identity: current stored phone (a new phone is provided via newPhone)
         phone: order.customer.phone,
         ...(editForm.customerName.trim()
@@ -161,6 +155,7 @@ const TrackOrder = () => {
       });
 
       setOrder(data);
+      setTrackToken(nextToken);
       setEditing(false);
     } catch (err) {
       setActionError(
@@ -182,10 +177,11 @@ const TrackOrder = () => {
     setActionError("");
 
     try {
-      const { data } = await orderApi.cancelOrder(
-        order.trackingCode,
-        order.customer.phone
-      );
+      const { data } = await orderApi.cancelOrder({
+        trackingCode: order.trackingCode,
+        phone: order.customer.phone,
+        trackToken,
+      });
 
       setOrder(data);
       setCancelArmed(false);
@@ -245,7 +241,7 @@ const TrackOrder = () => {
                 name="trackingCode"
                 value={form.trackingCode}
                 onChange={handleChange}
-                placeholder="Ex: STK-1A2B3"
+                placeholder="Ex: STK-1A2B3C4D5"
                 autoCapitalize="characters"
               />
 

@@ -10,6 +10,7 @@ const orderItemSchema = new mongoose.Schema({
   mealDay: {
     type: String,
     required: true,
+    maxlength: 30,
   },
 
  quantity: {
@@ -29,6 +30,7 @@ const orderItemSchema = new mongoose.Schema({
     type: String,
     default: "",
     trim: true,
+    maxlength: 200,
   },
 });
 

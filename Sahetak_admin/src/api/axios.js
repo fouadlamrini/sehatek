@@ -26,7 +26,9 @@ api.interceptors.request.use((config) => {
 // Single-flight refresh: several 401 responses share one refresh request.
 let refreshPromise = null;
 
-const requestNewTokens = async () => {
+// Exported so AuthContext can silently restore a session on reload from the
+// httpOnly cookie alone (no access token is persisted client-side).
+export const refreshAccessToken = async () => {
   // The refresh token lives in the httpOnly cookie, so no body is needed.
   // Bare axios so this call never runs through the interceptors below.
   const { data } = await axios.post(
@@ -35,10 +37,20 @@ const requestNewTokens = async () => {
     { withCredentials: true }
   );
 
-  setTokens({ token: data?.data?.token });
+  const token = data?.data?.token;
 
-  return data?.data?.token;
+  // Fail loudly instead of letting a subsequent request go out as
+  // "Bearer undefined" (which would loop through the retry logic).
+  if (!token) {
+    throw new Error("Refresh did not return a token");
+  }
+
+  setTokens({ token });
+
+  return token;
 };
+
+const requestNewTokens = refreshAccessToken;
 
 api.interceptors.response.use(
   (response) => response,

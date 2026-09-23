@@ -7,7 +7,7 @@ import {
 } from "react";
 
 import * as authApi from "../api/authApi";
-import { UNAUTHORIZED_EVENT } from "../api/axios";
+import { refreshAccessToken, UNAUTHORIZED_EVENT } from "../api/axios";
 import { clearTokens, getAccessToken, setTokens } from "../utils/tokenStorage";
 
 export const AuthContext = createContext(null);
@@ -16,17 +16,18 @@ export const AuthProvider = ({ children }) => {
   const [admin, setAdmin] = useState(null);
   const [initializing, setInitializing] = useState(true);
 
-  // On first load, restore the session from stored tokens.
+  // On first load, restore the session. The access token lives in memory
+  // only, so when it is missing we first try to mint a new one from the
+  // httpOnly refresh-token cookie before giving up.
   useEffect(() => {
     let active = true;
 
     const bootstrap = async () => {
-      if (!getAccessToken()) {
-        setInitializing(false);
-        return;
-      }
-
       try {
+        if (!getAccessToken()) {
+          await refreshAccessToken();
+        }
+
         const { data } = await authApi.getProfile();
 
         if (active) {
@@ -72,10 +73,17 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const logout = useCallback(async () => {
+    // Revoke server-side first (the httpOnly cookie must be cleared by the
+    // server). Retry once on transient network failures before giving up.
     try {
       await authApi.logout();
     } catch {
-      // Logging out locally must work even if the server call fails.
+      try {
+        await authApi.logout();
+      } catch {
+        // Local state is still cleared below: we never leave a stale session
+        // visible in the UI even if the server is unreachable.
+      }
     }
 
     clearTokens();

@@ -10,7 +10,6 @@ import OrderSummary from "../components/order/OrderSummary";
 
 import { useOrder } from "../context/OrderContext";
 import { useCartPricing } from "../hooks/useCartPricing";
-import { getErrorMessage } from "../utils/error";
 import { LOCATION_TYPE_LABELS, STEPS } from "../constants";
 import { computeOrderTotals } from "../utils/pricing";
 import { formatCurrency } from "../utils/formatters";
@@ -69,7 +68,6 @@ const Confirmation = () => {
   const { pricing, loading: pricingLoading } = useCartPricing(distinctProductIds);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [fieldErrors, setFieldErrors] = useState({});
 
   useEffect(() => {
     if (items.length === 0) {
@@ -88,7 +86,6 @@ const Confirmation = () => {
   const handleConfirm = async () => {
     setSubmitting(true);
     setError("");
-    setFieldErrors({});
 
     try {
       const { data } = await orderApi.createOrder(
@@ -98,10 +95,12 @@ const Confirmation = () => {
       setSubmittedOrder(data);
       navigate("/success");
     } catch (err) {
+      // Never dump raw server fields/validation to the client.
       setError(
-        getErrorMessage(err, "Échec de l'envoi de la commande. Réessayez.")
+        err?.response?.data?.errors
+          ? "Certaines informations sont invalides. Vérifiez vos champs."
+          : "Échec de l'envoi de la commande. Réessayez."
       );
-      setFieldErrors(err?.response?.data?.errors ?? {});
     } finally {
       setSubmitting(false);
     }
@@ -155,16 +154,6 @@ const Confirmation = () => {
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
             <span>{error}</span>
           </div>
-        ) : null}
-
-        {Object.keys(fieldErrors).length > 0 ? (
-          <ul className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-600">
-            {Object.entries(fieldErrors).map(([field, message]) => (
-              <li key={field}>
-                {field}: {message}
-              </li>
-            ))}
-          </ul>
         ) : null}
 
         <Button

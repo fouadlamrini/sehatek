@@ -7,6 +7,7 @@ const generateToken = (admin) => {
       id: admin._id,
       email: admin.email,
       role: admin.role,
+      v: admin.tokenVersion ?? 0,
     },
     process.env.JWT_SECRET,
     {
@@ -20,6 +21,7 @@ const generateRefreshToken = (admin) => {
     {
       id: admin._id,
       jti: crypto.randomUUID(),
+      v: admin.tokenVersion ?? 0,
     },
     process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET,
     {

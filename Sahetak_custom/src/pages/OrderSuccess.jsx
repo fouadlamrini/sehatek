@@ -91,9 +91,7 @@ const OrderSuccess = () => {
               size="lg"
               onClick={() =>
                 navigate(
-                  `/track?code=${encodeURIComponent(submittedOrder.trackingCode)}&phone=${encodeURIComponent(
-                    submittedOrder.customer?.phone ?? customer.phone
-                  )}`
+                  `/track?code=${encodeURIComponent(submittedOrder.trackingCode)}`
                 )
               }
               className="mt-3 w-full"

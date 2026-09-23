@@ -20,7 +20,7 @@ const adminSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      minlength: 6,
+      minlength: 8,
       select: false,
     },
 
@@ -28,6 +28,13 @@ const adminSchema = new mongoose.Schema(
       type: String,
       enum: ["admin", "super_admin"],
       default: "admin",
+    },
+
+    // Incremented on password change so all previously issued tokens become
+    // invalid (revokes active sessions).
+    tokenVersion: {
+      type: Number,
+      default: 0,
     },
   },
   {
@@ -42,7 +49,7 @@ adminSchema.pre("save", async function () {
     return;
   }
 
-  const salt = await bcrypt.genSalt(10);
+  const salt = await bcrypt.genSalt(12);
 
   this.password = await bcrypt.hash(this.password, salt);
 });

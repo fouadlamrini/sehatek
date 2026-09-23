@@ -19,8 +19,8 @@ const changePasswordValidator = [
   body("newPassword")
     .notEmpty()
     .withMessage("New password is required")
-    .isLength({ min: 6 })
-    .withMessage("New password must contain at least 6 characters"),
+    .isLength({ min: 8 })
+    .withMessage("New password must contain at least 8 characters"),
 ];
 
 const changeNameValidator = [
@@ -32,16 +32,8 @@ const changeNameValidator = [
     .withMessage("Name must not exceed 50 characters"),
 ];
 
-const refreshTokenValidator = [
-  body("refreshToken")
-    .optional()
-    .notEmpty()
-    .withMessage("Refresh token is required"),
-];
-
 module.exports = {
   loginValidator,
   changePasswordValidator,
   changeNameValidator,
-  refreshTokenValidator,
 };

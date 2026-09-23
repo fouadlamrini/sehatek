@@ -38,8 +38,8 @@ const CreateAdmin = () => {
 
     if (!form.password) {
       nextErrors.password = "Password is required";
-    } else if (form.password.length < 6) {
-      nextErrors.password = "Password must be at least 6 characters";
+    } else if (form.password.length < 8) {
+      nextErrors.password = "Password must be at least 8 characters";
     }
 
     setErrors(nextErrors);
@@ -150,7 +150,7 @@ const CreateAdmin = () => {
                 }))
               }
               error={errors.password}
-              placeholder="At least 6 characters"
+              placeholder="At least 8 characters"
               autoComplete="new-password"
             />
 

@@ -21,6 +21,12 @@ const corsOptions = require("./config/corsOptions");
 
 const app = express();
 
+// Behind Vercel/Railway the real client IP arrives via X-Forwarded-For.
+// Express must trust the proxy hop, otherwise every visitor looks like the
+// proxy IP (which breaks every per-client rate limit) and express-rate-limit
+// throws on requests carrying the header.
+app.set("trust proxy", 1);
+
 // =========================
 // MIDDLEWARES
 // =========================

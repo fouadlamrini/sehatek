@@ -67,8 +67,8 @@ const Profile = () => {
 
     if (!passwords.newPassword) {
       nextErrors.newPassword = "New password is required";
-    } else if (passwords.newPassword.length < 6) {
-      nextErrors.newPassword = "Password must be at least 6 characters";
+    } else if (passwords.newPassword.length < 8) {
+      nextErrors.newPassword = "Password must be at least 8 characters";
     }
 
     if (passwords.newPassword !== passwords.confirmPassword) {
@@ -202,7 +202,7 @@ const Profile = () => {
               value={passwords.newPassword}
               onChange={handlePasswordChange("newPassword")}
               error={passwordErrors.newPassword}
-              placeholder="At least 6 characters"
+              placeholder="At least 8 characters"
               autoComplete="new-password"
             />
 
