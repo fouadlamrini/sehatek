@@ -5,18 +5,22 @@ import { useSiteSettings } from "../../hooks/useSiteSettings";
 import Sahetak from "../../assets/sahetak.png";
 
 const SiteHeader = ({ itemsCount = 0 }) => {
-  const settings = useSiteSettings();
+  const { settings, loading } = useSiteSettings();
   const profileImage = settings?.profileImage?.url || Sahetak;
 
   return (
     <header className="sticky top-0 z-30 border-b border-gray-100 bg-white/95 backdrop-blur">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
         <div className="flex items-center gap-2">
-          <img
-            src={profileImage}
-            alt="Sehatek"
-            className="h-9 w-9 rounded-full object-cover"
-          />
+          {loading ? (
+            <span className="h-9 w-9 animate-pulse rounded-full bg-gray-200" />
+          ) : (
+            <img
+              src={profileImage}
+              alt="Sehatek"
+              className="h-9 w-9 rounded-full object-cover"
+            />
+          )}
           <span className="text-lg font-extrabold tracking-tight text-forest">
             Sehatek
           </span>

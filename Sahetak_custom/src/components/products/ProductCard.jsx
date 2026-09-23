@@ -45,6 +45,12 @@ const ProductCard = ({
         </span>
       ) : null}
 
+      {outOfStock && !isSelected ? (
+        <span className="absolute -top-3 left-2 z-10 flex rotate-[-6deg] items-center rounded-full bg-red-600 px-3 py-1.5 text-xs font-extrabold uppercase tracking-wider text-white shadow-lg ring-2 ring-white">
+          Rupture de stock
+        </span>
+      ) : null}
+
       <div className="flex items-center gap-4 p-4">
         <input
           type="checkbox"
@@ -67,13 +73,7 @@ const ProductCard = ({
               "h-full w-full object-cover transition-transform duration-300 group-hover:scale-105",
               outOfStock && !isSelected && "grayscale"
             )}
-          />
-
-          {outOfStock && !isSelected ? (
-            <span className="absolute left-1 top-1 rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white">
-              Rupture de stock
-            </span>
-          ) : null}
+/>
 
           <div className="absolute inset-0 bg-black/10 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
 

@@ -5,9 +5,10 @@ import { useSiteSettings } from '../hooks/useSiteSettings';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const settings = useSiteSettings();
+  const { settings, loading } = useSiteSettings();
 
-  // Admin-managed images fall back to the packaged defaults.
+  // Admin-managed images fall back to the packaged defaults, only after the
+  // fetch settles — never while loading.
   const bannerImage = settings?.bannerImage?.url || Plats;
   const profileImage = settings?.profileImage?.url || Sahetak;
 
@@ -23,65 +24,69 @@ const Header = () => {
         {/* PHOTO BANNER */}
         {/* ========================= */}
 
-        <div
-          onClick={() => setIsOpen(true)}
-          className="
-            relative
-            h-48
-            sm:h-56
-            md:h-64
-            w-full
-            bg-gray-200
-            cursor-pointer
-            group
-            overflow-hidden
-          "
-        >
-          <img
-            src={bannerImage}
-            alt="Banner"
-            className="
-              w-full
-              h-full
-              object-cover
-              transition-transform
-              duration-300
-              group-hover:scale-105
-            "
-          />
-
-          {/* Hover Overlay */}
-
+        {loading ? (
+          <div className="relative h-48 sm:h-56 md:h-64 w-full animate-pulse bg-gray-200" />
+        ) : (
           <div
+            onClick={() => setIsOpen(true)}
             className="
-              absolute
-              inset-0
-              bg-black/20
-              opacity-0
-              group-hover:opacity-100
-              transition-opacity
-              duration-300
-              flex
-              items-center
-              justify-center
+              relative
+              h-48
+              sm:h-56
+              md:h-64
+              w-full
+              bg-gray-200
+              cursor-pointer
+              group
+              overflow-hidden
             "
           >
-            <span
+            <img
+              src={bannerImage}
+              alt="Banner"
               className="
-                text-white
-                text-sm
-                font-medium
-                bg-black/50
-                px-3
-                py-1
-                rounded-full
-                backdrop-blur-sm
+                w-full
+                h-full
+                object-cover
+                transition-transform
+                duration-300
+                group-hover:scale-105
+              "
+            />
+
+            {/* Hover Overlay */}
+
+            <div
+              className="
+                absolute
+                inset-0
+                bg-black/20
+                opacity-0
+                group-hover:opacity-100
+                transition-opacity
+                duration-300
+                flex
+                items-center
+                justify-center
               "
             >
-              Afficher la photo
-            </span>
+              <span
+                className="
+                  text-white
+                  text-sm
+                  font-medium
+                  bg-black/50
+                  px-3
+                  py-1
+                  rounded-full
+                  backdrop-blur-sm
+                "
+              >
+                Afficher la photo
+              </span>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* ========================= */}
         {/* PROFILE */}
@@ -103,32 +108,52 @@ const Header = () => {
             {/* PROFILE IMAGE */}
             {/* ========================= */}
 
-            <div
-              className="
-                relative
-                w-32
-                h-32
-                sm:w-36
-                sm:h-36
-                rounded-full
-                border-4
-                border-white
-                shadow-lg
-                overflow-hidden
-                bg-gray-100
-                flex-shrink-0
-              "
-            >
-              <img
-                src={profileImage}
-                alt="Profile"
+            {loading ? (
+              <div
                 className="
-                  w-full
-                  h-full
-                  object-cover
+                  w-32
+                  h-32
+                  sm:w-36
+                  sm:h-36
+                  -mt-16
+                  sm:-mt-20
+                  rounded-full
+                  border-4
+                  border-white
+                  shadow-lg
+                  bg-gray-200
+                  animate-pulse
+                  flex-shrink-0
                 "
               />
-            </div>
+            ) : (
+              <div
+                className="
+                  relative
+                  w-32
+                  h-32
+                  sm:w-36
+                  sm:h-36
+                  rounded-full
+                  border-4
+                  border-white
+                  shadow-lg
+                  overflow-hidden
+                  bg-gray-100
+                  flex-shrink-0
+                "
+              >
+                <img
+                  src={profileImage}
+                  alt="Profile"
+                  className="
+                    w-full
+                    h-full
+                    object-cover
+                  "
+                />
+              </div>
+            )}
 
             {/* ========================= */}
             {/* NAME */}
