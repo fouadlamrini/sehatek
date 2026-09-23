@@ -55,6 +55,20 @@ const OrderSuccess = () => {
             . Notre équipe vous contactera pour la confirmation.
           </p>
 
+          {reference ? (
+            <div className="mt-4 rounded-2xl border border-primary/20 bg-primary-soft/60 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+                Code de suivi
+              </p>
+              <p className="mt-1 select-all text-lg font-extrabold text-forest">
+                {reference}
+              </p>
+              <p className="mt-1 text-xs text-gray-500">
+                Gardez ce code pour suivre votre commande.
+              </p>
+            </div>
+          ) : null}
+
           <div className="mt-5 rounded-2xl bg-gray-50 p-4 text-left text-sm">
             <div className="flex justify-between text-gray-500">
               <span>Client</span>

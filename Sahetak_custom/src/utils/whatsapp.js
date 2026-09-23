@@ -3,8 +3,15 @@ import { LOCATION_TYPE_LABELS } from "../constants";
 export const getWhatsappNumber = () =>
   (import.meta.env.VITE_WHATSAPP_NUMBER || "").replace(/[^0-9]/g, "");
 
-export const getOrderReference = (order) =>
-  order?._id ? `#${String(order._id).slice(-6).toUpperCase()}` : "";
+// The visible order reference IS the tracking code: the client must be able
+// to re-enter it on the track page without copying it beforehand.
+export const getOrderReference = (order) => {
+  if (order?.trackingCode) {
+    return order.trackingCode;
+  }
+
+  return order?._id ? `#${String(order._id).slice(-6).toUpperCase()}` : "";
+};
 
 export const buildOrderMessage = (items, customer, delivery, order) => {
   const ref = getOrderReference(order);

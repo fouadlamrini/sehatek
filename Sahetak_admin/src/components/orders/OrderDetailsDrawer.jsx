@@ -24,7 +24,7 @@ const OrderDetailsDrawer = ({ open, onClose, order, onStatusChange, updating }) 
     <Drawer
       open={open}
       onClose={onClose}
-      title={`Order #${order._id.slice(-6).toUpperCase()}`}
+      title={order.trackingCode ? `Order ${order.trackingCode}` : `Order #${order._id.slice(-6).toUpperCase()}`}
       description={formatDate(order.createdAt)}
       size="lg"
     >

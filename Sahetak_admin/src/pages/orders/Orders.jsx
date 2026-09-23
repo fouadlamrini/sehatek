@@ -238,7 +238,8 @@ const Orders = () => {
                 <TD>
                   <div>
                     <p className="font-semibold text-gray-800">
-                      #{order._id.slice(-6).toUpperCase()}
+                      {order.trackingCode ??
+                        `#${order._id.slice(-6).toUpperCase()}`}
                     </p>
                     <p className="text-xs text-gray-400">
                       {formatDate(order.createdAt)}
