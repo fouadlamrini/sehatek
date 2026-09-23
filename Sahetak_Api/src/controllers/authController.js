@@ -11,6 +11,18 @@ const {
   hashToken,
 } = require("../utils/generateToken");
 
+// The refresh-token cookie must survive requests from the admin panel on a
+// different origin (Vercel) to the API (Render). A cross-site cookie requires
+// SameSite=None + Secure, which is fine here: every state-changing admin call
+// is authorized with the in-memory Bearer token, not this cookie, and the
+// cookie only mints new access tokens on the dedicated /auth/refresh route.
+const cookieOptions = (maxAge) => ({
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+  ...(maxAge ? { maxAge } : {}),
+});
+
 // =========================
 // LOGIN
 // =========================
@@ -51,12 +63,7 @@ const login = async (req, res, next) => {
     });
 
     // Store the refresh token in a secure httpOnly cookie, not in the JSON body
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie("refreshToken", refreshToken, cookieOptions(7 * 24 * 60 * 60 * 1000));
 
     return res.status(200).json({
       success: true,
@@ -118,12 +125,7 @@ const changePassword = async (req, res, next) => {
       expiresAt: getTokenExpiry(refreshToken),
     });
 
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie("refreshToken", refreshToken, cookieOptions(7 * 24 * 60 * 60 * 1000));
 
     return res.status(200).json({
       success: true,
@@ -212,11 +214,7 @@ const logout = async (req, res, next) => {
     }
 
     // Clear the refresh token cookie
-    res.clearCookie("refreshToken", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-    });
+    res.clearCookie("refreshToken", cookieOptions());
 
     const decoded = jwt.decode(token);
 
@@ -255,11 +253,7 @@ const refresh = async (req, res, next) => {
     const refreshToken = req.cookies.refreshToken;
 
     const clearCookie = () => {
-      res.clearCookie("refreshToken", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-      });
+      res.clearCookie("refreshToken", cookieOptions());
     };
 
     if (!refreshToken) {
@@ -327,12 +321,7 @@ const refresh = async (req, res, next) => {
     });
 
     // Refresh the token via the httpOnly cookie
-    res.cookie("refreshToken", newRefreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie("refreshToken", newRefreshToken, cookieOptions(7 * 24 * 60 * 60 * 1000));
 
     return res.status(200).json({
       success: true,

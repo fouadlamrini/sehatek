@@ -17,13 +17,13 @@ const {
 
 const validate = require("../middleware/validationMiddleware");
 const authMiddleware = require("../middleware/authMiddleware");
-const { authLimiter } = require("../middleware/rateLimitMiddleware");
+const { authLimiter, refreshLimiter } = require("../middleware/rateLimitMiddleware");
 
 const router = express.Router();
 
 // Public
 router.post("/login", authLimiter, loginValidator, validate, login);
-router.post("/refresh", authLimiter, refresh);
+router.post("/refresh", refreshLimiter, refresh);
 
 // Protected
 router.patch(

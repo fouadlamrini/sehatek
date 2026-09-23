@@ -40,6 +40,25 @@ const authLimiter = rateLimit({
 });
 
 // =========================
+// REFRESH LIMITER (token refresh via cookie)
+// =========================
+// Kept separate from the login limiter: a fresh page load attempts a silent
+// refresh, so we don't want those to consume the login brute-force budget.
+
+const refreshLimiter = rateLimit({
+  windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
+  max: Number(process.env.RATE_LIMIT_MAX_REFRESH) || 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  validate: {
+    xForwardedForHeader: false,
+  },
+  message: {
+    message: "Too many requests, please try again later",
+  },
+});
+
+// =========================
 // ORDER LIMITER (public order creation)
 // =========================
 
@@ -59,5 +78,6 @@ const orderLimiter = rateLimit({
 module.exports = {
   apiLimiter,
   authLimiter,
+  refreshLimiter,
   orderLimiter,
 };
