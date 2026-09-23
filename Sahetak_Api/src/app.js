@@ -1,6 +1,7 @@
 const express = require("express");
 const helmet = require("helmet");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
 const authRoutes = require("./routes/authRoutes");
 const adminRoutes = require("./routes/adminRoutes");
@@ -44,6 +45,9 @@ app.use(requestLogger);
 // Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Cookie parser (for httpOnly refresh token cookie)
+app.use(cookieParser());
 
 // Rate limiting for all API requests
 app.use("/api", apiLimiter);

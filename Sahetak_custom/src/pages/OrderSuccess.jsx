@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle2, Home, MessageCircle } from "lucide-react";
+import { CheckCircle2, Home, MessageCircle, PackageSearch } from "lucide-react";
 
 import Button from "../components/ui/Button";
 import SiteHeader from "../components/layout/SiteHeader";
@@ -82,6 +82,24 @@ const OrderSuccess = () => {
                 Confirmer sur WhatsApp
               </Button>
             </a>
+          ) : null}
+
+          {submittedOrder.trackingCode ? (
+            <Button
+              variant="outline"
+              icon={PackageSearch}
+              size="lg"
+              onClick={() =>
+                navigate(
+                  `/track?code=${encodeURIComponent(submittedOrder.trackingCode)}&phone=${encodeURIComponent(
+                    submittedOrder.customer?.phone ?? customer.phone
+                  )}`
+                )
+              }
+              className="mt-3 w-full"
+            >
+              Suivre ma commande
+            </Button>
           ) : null}
 
           <Button

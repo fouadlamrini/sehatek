@@ -6,6 +6,15 @@ const deliverySchema = require("./Delivery");
 
 const orderSchema = new mongoose.Schema(
   {
+    trackingCode: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      default: () =>
+        "STK-" + Math.random().toString(36).substring(2, 7).toUpperCase(),
+    },
+
     items: {
       type: [orderItemSchema],
       required: true,

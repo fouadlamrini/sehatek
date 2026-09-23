@@ -71,6 +71,16 @@ const createOrderValidator = [
     .optional()
     .isString()
     .withMessage("Receiver name must be a string"),
+
+  body("delivery.latitude")
+    .optional({ values: "null" })
+    .isFloat({ min: -90, max: 90 })
+    .withMessage("Latitude must be between -90 and 90"),
+
+  body("delivery.longitude")
+    .optional({ values: "null" })
+    .isFloat({ min: -180, max: 180 })
+    .withMessage("Longitude must be between -180 and 180"),
 ];
 
 const updateOrderStatusValidator = [
@@ -79,8 +89,75 @@ const updateOrderStatusValidator = [
     .withMessage("Invalid order status"),
 ];
 
+const guestIdentityValidator = [
+  body("trackingCode")
+    .trim()
+    .notEmpty()
+    .withMessage("Tracking code is required"),
+
+  body("phone")
+    .trim()
+    .notEmpty()
+    .withMessage("Phone number is required"),
+];
+
+const guestTrackValidator = guestIdentityValidator;
+
+const guestCancelValidator = guestIdentityValidator;
+
+const guestUpdateValidator = [
+  ...guestIdentityValidator,
+
+  body("customerName")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage("Customer name must not be empty"),
+
+  body("newPhone")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage("New phone must not be empty"),
+
+  body("delivery.city")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage("City must not be empty"),
+
+  body("delivery.quartier")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage("Quartier must not be empty"),
+
+  body("delivery.locationType")
+    .optional()
+    .isIn(ALLOWED_LOCATION_TYPES)
+    .withMessage("Invalid delivery type"),
+
+  body("delivery.receiverName")
+    .optional()
+    .isString()
+    .withMessage("Receiver name must be a string"),
+
+  body("delivery.latitude")
+    .optional({ values: "null" })
+    .isFloat({ min: -90, max: 90 })
+    .withMessage("Latitude must be between -90 and 90"),
+
+  body("delivery.longitude")
+    .optional({ values: "null" })
+    .isFloat({ min: -180, max: 180 })
+    .withMessage("Longitude must be between -180 and 180"),
+];
+
 module.exports = {
   orderIdValidator,
   createOrderValidator,
   updateOrderStatusValidator,
+  guestTrackValidator,
+  guestCancelValidator,
+  guestUpdateValidator,
 };

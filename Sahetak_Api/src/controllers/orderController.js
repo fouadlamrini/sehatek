@@ -108,6 +108,8 @@ const createOrder = async (req, res, next) => {
         quartier: delivery.quartier,
         locationType: delivery.locationType,
         receiverName: delivery.receiverName || "",
+        latitude: delivery.latitude ?? null,
+        longitude: delivery.longitude ?? null,
       },
 
       subtotal: orderTotals.subtotal,
@@ -124,6 +126,142 @@ const createOrder = async (req, res, next) => {
     return res.status(201).json({
       success: true,
       message: "Order created successfully",
+      data: order,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// =========================
+// GUEST ORDER TRACKING
+// =========================
+
+const getOrderByTracking = async (trackingCode, phone) => {
+  const order = await Order.findOne({
+    trackingCode: String(trackingCode).trim().toUpperCase(),
+    "customer.phone": String(phone).trim(),
+  }).populate("items.product", "name image price mealDays");
+
+  if (!order) {
+    throw new AppError(
+      "Order not found. Check the tracking code and phone number.",
+      404
+    );
+  }
+
+  return order;
+};
+
+const getGuestOrder = async (req, res, next) => {
+  try {
+    const { trackingCode, phone } = req.body;
+
+    const order = await getOrderByTracking(trackingCode, phone);
+
+    return res.status(200).json({
+      success: true,
+      message: "Order retrieved successfully",
+      data: order,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const cancelGuestOrder = async (req, res, next) => {
+  try {
+    const { trackingCode, phone } = req.body;
+
+    const order = await getOrderByTracking(trackingCode, phone);
+
+    // Only pending orders can be cancelled by the guest
+    if (order.status !== "pending") {
+      throw new AppError(
+        "Order can only be cancelled while it is pending",
+        400
+      );
+    }
+
+    // Restore stock for each item
+    for (const item of order.items) {
+      const productId = item.product._id || item.product;
+
+      await Product.findByIdAndUpdate(productId, {
+        $inc: {
+          stock: item.quantity,
+        },
+      });
+    }
+
+    order.status = "cancelled";
+
+    await order.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Order cancelled successfully",
+      data: order,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateGuestOrder = async (req, res, next) => {
+  try {
+    const { trackingCode, phone, delivery, customerName, newPhone } =
+      req.body;
+
+    const order = await getOrderByTracking(trackingCode, phone);
+
+    // Only pending orders can be updated by the guest
+    if (order.status !== "pending") {
+      throw new AppError(
+        "Order can only be updated while it is pending",
+        400
+      );
+    }
+
+    if (customerName) {
+      order.customer.name = customerName;
+    }
+
+    if (newPhone) {
+      order.customer.phone = newPhone;
+    }
+
+    if (delivery) {
+      if (delivery.city) {
+        order.delivery.city = delivery.city;
+      }
+
+      if (delivery.quartier) {
+        order.delivery.quartier = delivery.quartier;
+      }
+
+      if (delivery.locationType) {
+        order.delivery.locationType = delivery.locationType;
+      }
+
+      if (delivery.receiverName !== undefined) {
+        order.delivery.receiverName = delivery.receiverName;
+      }
+
+      if (
+        delivery.latitude != null &&
+        delivery.longitude != null
+      ) {
+        order.delivery.latitude = delivery.latitude;
+        order.delivery.longitude = delivery.longitude;
+      }
+    }
+
+    await order.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Order updated successfully",
       data: order,
     });
   } catch (error) {
@@ -247,4 +385,7 @@ module.exports = {
   getOrder,
   updateOrderStatus,
   deleteOrder,
+  getGuestOrder,
+  cancelGuestOrder,
+  updateGuestOrder,
 };

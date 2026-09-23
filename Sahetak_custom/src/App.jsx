@@ -6,6 +6,7 @@ import CustomerInfo from "./pages/CustomerInfo";
 import DeliveryInfo from "./pages/DeliveryInfo";
 import Confirmation from "./pages/Confirmation";
 import OrderSuccess from "./pages/OrderSuccess";
+import TrackOrder from "./pages/TrackOrder";
 import NotFound from "./pages/NotFound";
 
 const App = () => (
@@ -17,6 +18,7 @@ const App = () => (
         <Route path="/livraison" element={<DeliveryInfo />} />
         <Route path="/confirmation" element={<Confirmation />} />
         <Route path="/success" element={<OrderSuccess />} />
+        <Route path="/track" element={<TrackOrder />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </OrderProvider>

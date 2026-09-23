@@ -6,8 +6,8 @@ export const login = (credentials) =>
 export const getProfile = () =>
   api.get("/auth/me").then((response) => response.data);
 
-export const logout = (refreshToken) =>
-  api.post("/auth/logout", { refreshToken }).then((response) => response.data);
+export const logout = () =>
+  api.post("/auth/logout").then((response) => response.data);
 
 export const changePassword = (payload) =>
   api

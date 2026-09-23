@@ -20,7 +20,10 @@ const apiLimiter = rateLimit({
 
 const authLimiter = rateLimit({
   windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
-  max: Number(process.env.RATE_LIMIT_MAX_AUTH) || 20,
+  max:
+    process.env.NODE_ENV === "production"
+      ? Number(process.env.RATE_LIMIT_MAX_AUTH) || 5
+      : Number(process.env.RATE_LIMIT_MAX_AUTH_DEV) || 100,
   standardHeaders: true,
   legacyHeaders: false,
   message: {

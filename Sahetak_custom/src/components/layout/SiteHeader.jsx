@@ -1,3 +1,6 @@
+import { Link } from "react-router-dom";
+import { PackageSearch } from "lucide-react";
+
 import { useSiteSettings } from "../../hooks/useSiteSettings";
 import Sahetak from "../../assets/sahetak.png";
 
@@ -19,8 +22,18 @@ const SiteHeader = ({ itemsCount = 0 }) => {
           </span>
         </div>
 
-        <div className="flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1.5 text-sm font-bold text-primary">
-          🛒 <span>{itemsCount}</span>
+        <div className="flex items-center gap-3">
+          <Link
+            to="/track"
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-bold text-primary transition hover:bg-primary-soft"
+          >
+            <PackageSearch className="h-4 w-4" />
+            <span className="hidden sm:inline">Suivre ma commande</span>
+          </Link>
+
+          <div className="flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1.5 text-sm font-bold text-primary">
+            🛒 <span>{itemsCount}</span>
+          </div>
         </div>
       </div>
     </header>

@@ -6,12 +6,18 @@ const {
   getOrder,
   updateOrderStatus,
   deleteOrder,
+  getGuestOrder,
+  cancelGuestOrder,
+  updateGuestOrder,
 } = require("../controllers/orderController");
 
 const {
   orderIdValidator,
   createOrderValidator,
   updateOrderStatusValidator,
+  guestTrackValidator,
+  guestCancelValidator,
+  guestUpdateValidator,
 } = require("../validators/orderValidator");
 
 const validate = require("../middleware/validationMiddleware");
@@ -30,6 +36,34 @@ router.post(
   createOrderValidator,
   validate,
   createOrder
+);
+
+// =========================
+// GUEST TRACKING (public)
+// =========================
+
+router.post(
+  "/track",
+  orderLimiter,
+  guestTrackValidator,
+  validate,
+  getGuestOrder
+);
+
+router.patch(
+  "/track/cancel",
+  orderLimiter,
+  guestCancelValidator,
+  validate,
+  cancelGuestOrder
+);
+
+router.patch(
+  "/track/update",
+  orderLimiter,
+  guestUpdateValidator,
+  validate,
+  updateGuestOrder
 );
 
 // =========================

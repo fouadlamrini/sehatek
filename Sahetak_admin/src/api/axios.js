@@ -1,11 +1,6 @@
 import axios from "axios";
 
-import {
-  clearTokens,
-  getAccessToken,
-  getRefreshToken,
-  setTokens,
-} from "../utils/tokenStorage";
+import { clearTokens, getAccessToken, setTokens } from "../utils/tokenStorage";
 
 const baseURL = import.meta.env.VITE_API_URL;
 
@@ -13,7 +8,9 @@ const baseURL = import.meta.env.VITE_API_URL;
 // clear the current admin and send the user back to the login page.
 export const UNAUTHORIZED_EVENT = "sehatek:unauthorized";
 
-const api = axios.create({ baseURL });
+// withCredentials is required so the httpOnly refresh-token cookie is sent
+// and updated on every request.
+const api = axios.create({ baseURL, withCredentials: true });
 
 // Attach the current access token to every request.
 api.interceptors.request.use((config) => {
@@ -30,19 +27,15 @@ api.interceptors.request.use((config) => {
 let refreshPromise = null;
 
 const requestNewTokens = async () => {
-  const refreshToken = getRefreshToken();
-
-  if (!refreshToken) {
-    throw new Error("No refresh token available");
-  }
-
+  // The refresh token lives in the httpOnly cookie, so no body is needed.
   // Bare axios so this call never runs through the interceptors below.
-  const { data } = await axios.post(`${baseURL}/auth/refresh`, { refreshToken });
+  const { data } = await axios.post(
+    `${baseURL}/auth/refresh`,
+    null,
+    { withCredentials: true }
+  );
 
-  setTokens({
-    token: data?.data?.token,
-    refreshToken: data?.data?.refreshToken,
-  });
+  setTokens({ token: data?.data?.token });
 
   return data?.data?.token;
 };

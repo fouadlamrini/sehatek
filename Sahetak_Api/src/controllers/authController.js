@@ -50,12 +50,19 @@ const login = async (req, res, next) => {
       expiresAt: getTokenExpiry(refreshToken),
     });
 
+    // Store the refresh token in a secure httpOnly cookie, not in the JSON body
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     return res.status(200).json({
       success: true,
       message: "Login successful",
       data: {
         token,
-        refreshToken,
         admin: {
           id: admin._id,
           name: admin.name,
@@ -169,7 +176,7 @@ const getProfile = async (req, res, next) => {
 const logout = async (req, res, next) => {
   try {
     const token = req.token;
-    const { refreshToken } = req.body;
+    const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
 
     // Revoke the refresh token (hashed) if provided
     if (refreshToken) {
@@ -177,6 +184,13 @@ const logout = async (req, res, next) => {
         token: hashToken(refreshToken),
       });
     }
+
+    // Clear the refresh token cookie
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
 
     const decoded = jwt.decode(token);
 
@@ -211,7 +225,8 @@ const logout = async (req, res, next) => {
 
 const refresh = async (req, res, next) => {
   try {
-    const { refreshToken } = req.body;
+    // Prefer the refresh token from the httpOnly cookie (fallback: JSON body)
+    const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
 
     // Verify refresh token signature
     let payload;
@@ -260,12 +275,19 @@ const refresh = async (req, res, next) => {
       expiresAt: getTokenExpiry(newRefreshToken),
     });
 
+    // Refresh the token via the httpOnly cookie
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     return res.status(200).json({
       success: true,
       message: "Tokens refreshed successfully",
       data: {
         token,
-        refreshToken: newRefreshToken,
       },
     });
   } catch (error) {

@@ -10,7 +10,7 @@ const generateToken = (admin) => {
     },
     process.env.JWT_SECRET,
     {
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRES || "1d",
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRES || "15m",
     }
   );
 };

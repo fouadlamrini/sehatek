@@ -8,12 +8,7 @@ import {
 
 import * as authApi from "../api/authApi";
 import { UNAUTHORIZED_EVENT } from "../api/axios";
-import {
-  clearTokens,
-  getAccessToken,
-  getRefreshToken,
-  setTokens,
-} from "../utils/tokenStorage";
+import { clearTokens, getAccessToken, setTokens } from "../utils/tokenStorage";
 
 export const AuthContext = createContext(null);
 
@@ -70,17 +65,15 @@ export const AuthProvider = ({ children }) => {
   const login = useCallback(async (credentials) => {
     const { data } = await authApi.login(credentials);
 
-    setTokens({ token: data.token, refreshToken: data.refreshToken });
+    setTokens({ token: data.token });
     setAdmin(data.admin);
 
     return data.admin;
   }, []);
 
   const logout = useCallback(async () => {
-    const refreshToken = getRefreshToken();
-
     try {
-      await authApi.logout(refreshToken);
+      await authApi.logout();
     } catch {
       // Logging out locally must work even if the server call fails.
     }

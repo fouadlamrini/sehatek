@@ -23,6 +23,8 @@ export const OrderProvider = ({ children }) => {
     quartier: "",
     locationType: "home",
     receiverName: "",
+    latitude: null,
+    longitude: null,
   });
   const [submittedOrder, setSubmittedOrder] = useState(null);
 
@@ -98,6 +100,8 @@ export const OrderProvider = ({ children }) => {
       quartier: "",
       locationType: "home",
       receiverName: "",
+      latitude: null,
+      longitude: null,
     });
     setSubmittedOrder(null);
   }, []);

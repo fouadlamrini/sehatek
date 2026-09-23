@@ -20,3 +20,20 @@ export const STEPS = [
   { key: "delivery", label: "Livraison", path: "/livraison" },
   { key: "confirmation", label: "Confirmation", path: "/confirmation" },
 ];
+
+export const ORDER_STATUS_LABELS = {
+  pending: "En attente",
+  confirmed: "Confirmée",
+  preparing: "En préparation",
+  delivering: "En route",
+  delivered: "Livrée",
+  cancelled: "Annulée",
+};
+
+export const TRACK_STEPS = [
+  { key: "pending", label: "En attente" },
+  { key: "confirmed", label: "Confirmée" },
+  { key: "preparing", label: "En préparation" },
+  { key: "delivering", label: "En route" },
+  { key: "delivered", label: "Livrée" },
+];

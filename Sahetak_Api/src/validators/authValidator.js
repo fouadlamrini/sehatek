@@ -34,6 +34,7 @@ const changeNameValidator = [
 
 const refreshTokenValidator = [
   body("refreshToken")
+    .optional()
     .notEmpty()
     .withMessage("Refresh token is required"),
 ];
