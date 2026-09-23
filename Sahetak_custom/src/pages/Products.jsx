@@ -7,6 +7,7 @@ import * as packApi from "../api/packApi";
 
 import Header from "../components/Header";
 import Slide from "../components/Slide";
+import Faq from "../components/Faq";
 import SiteHeader from "../components/layout/SiteHeader";
 import OrderProgress from "../components/order/OrderProgress";
 import ProductGrid from "../components/products/ProductGrid";
@@ -271,6 +272,8 @@ const Products = () => {
             </div>
           </>
         )}
+
+        <Faq />
       </div>
 
       <Slide />
