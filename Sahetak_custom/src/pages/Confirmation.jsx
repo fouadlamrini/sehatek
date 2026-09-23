@@ -33,12 +33,6 @@ const buildPayload = (items, customer, delivery) => ({
     ...(delivery.receiverName.trim()
       ? { receiverName: delivery.receiverName.trim() }
       : {}),
-    ...(delivery.latitude != null && delivery.longitude != null
-      ? {
-          latitude: delivery.latitude,
-          longitude: delivery.longitude,
-        }
-      : {}),
   },
 });
 

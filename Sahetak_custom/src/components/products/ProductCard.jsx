@@ -11,6 +11,7 @@ const ProductCard = ({
   mealDay,
   quantity,
   note,
+  maxQty = MAX_ITEM_QUANTITY,
   onToggle,
   onQuantityChange,
   onNoteChange,
@@ -21,6 +22,9 @@ const ProductCard = ({
   const isSelected = quantity > 0;
   const hasPromotion = Boolean(product.promotion);
   const unitPrice = Number(product.promotion?.finalPrice ?? product.price);
+
+  const stock = Number(product.stock);
+  const outOfStock = Number.isFinite(stock) && stock <= 0;
 
   const handleToggle = () => {
     onToggle();
@@ -46,8 +50,9 @@ const ProductCard = ({
           type="checkbox"
           checked={isSelected}
           onChange={handleToggle}
+          disabled={!isSelected && outOfStock}
           style={{ accentColor: "#E58730" }}
-          className="h-5 w-5 flex-shrink-0 cursor-pointer rounded"
+          className="h-5 w-5 flex-shrink-0 cursor-pointer rounded disabled:cursor-not-allowed disabled:opacity-40"
         />
 
         <div
@@ -58,8 +63,17 @@ const ProductCard = ({
             src={product.image}
             alt={product.name}
             loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className={cn(
+              "h-full w-full object-cover transition-transform duration-300 group-hover:scale-105",
+              outOfStock && !isSelected && "grayscale"
+            )}
           />
+
+          {outOfStock && !isSelected ? (
+            <span className="absolute left-1 top-1 rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white">
+              Rupture de stock
+            </span>
+          ) : null}
 
           <div className="absolute inset-0 bg-black/10 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
 
@@ -113,7 +127,7 @@ const ProductCard = ({
                 <QuantityStepper
                   value={quantity}
                   min={1}
-                  max={MAX_ITEM_QUANTITY}
+                  max={maxQty}
                   onChange={onQuantityChange}
                 />
               </div>

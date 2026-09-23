@@ -1,6 +1,6 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Loader2, Map, MapPin, SpellCheck } from "lucide-react";
+import { ArrowRight, MapPin } from "lucide-react";
 
 import StepLayout from "../components/layout/StepLayout";
 import Button from "../components/ui/Button";
@@ -11,30 +11,11 @@ import { LOCATION_TYPES, STEPS } from "../constants";
 import { validateDelivery } from "../utils/validation";
 import { cn } from "../utils/cn";
 
-const MapLocationPicker = lazy(() =>
-  import("../components/delivery/MapLocationPicker")
-);
-
-const MODES = [
-  { value: "manual", label: "Manuel", icon: SpellCheck },
-  { value: "map", label: "Sur la carte", icon: Map },
-];
-
 const DeliveryInfo = () => {
   const navigate = useNavigate();
   const { items, customer, delivery, setDelivery } = useOrder();
 
-  const [mode, setMode] = useState(
-    delivery.latitude != null && delivery.longitude != null ? "map" : "manual"
-  );
-  const [form, setForm] = useState({
-    city: delivery.city,
-    quartier: delivery.quartier,
-    locationType: delivery.locationType,
-    receiverName: delivery.receiverName,
-    latitude: delivery.latitude ?? null,
-    longitude: delivery.longitude ?? null,
-  });
+  const [form, setForm] = useState(delivery);
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -51,28 +32,10 @@ const DeliveryInfo = () => {
     setErrors((current) => ({ ...current, [name]: undefined }));
   };
 
-  const handleMapSelect = ({ city, quartier, latitude, longitude }) => {
-    setForm((current) => ({
-      ...current,
-      city,
-      quartier,
-      latitude,
-      longitude,
-    }));
-    setErrors((current) => ({
-      ...current,
-      city: undefined,
-      quartier: undefined,
-      coordinates: undefined,
-    }));
-  };
-
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    const nextErrors = validateDelivery(form, {
-      requireCoordinates: mode === "map",
-    });
+    const nextErrors = validateDelivery(form);
 
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
@@ -84,8 +47,6 @@ const DeliveryInfo = () => {
       quartier: form.quartier.trim(),
       locationType: form.locationType,
       receiverName: form.receiverName.trim(),
-      latitude: form.latitude ?? null,
-      longitude: form.longitude ?? null,
     });
     navigate("/confirmation");
   };
@@ -106,101 +67,26 @@ const DeliveryInfo = () => {
           <span className="text-sm font-bold">Adresse de livraison</span>
         </div>
 
-        <div className="mb-4 grid grid-cols-2 gap-2">
-          {MODES.map(({ value, label, icon: Icon }) => {
-            const selected = mode === value;
-
-            return (
-              <button
-                key={value}
-                type="button"
-                onClick={() => setMode(value)}
-                className={cn(
-                  "flex items-center justify-center gap-2 rounded-xl border px-3 py-3 text-sm font-semibold transition",
-                  selected
-                    ? "border-primary bg-primary-soft text-primary"
-                    : "border-gray-200 bg-white text-gray-600 hover:border-primary/50"
-                )}
-              >
-                <Icon className="h-4 w-4" />
-                {label}
-              </button>
-            );
-          })}
-        </div>
-
         <div className="space-y-4">
-          {mode === "manual" ? (
-            <>
-              <Input
-                label="Ville"
-                name="city"
-                value={form.city}
-                onChange={handleChange}
-                error={errors.city}
-                placeholder="Ex: Casablanca"
-                autoComplete="address-level2"
-              />
+          <Input
+            label="Ville"
+            name="city"
+            value={form.city}
+            onChange={handleChange}
+            error={errors.city}
+            placeholder="Ex: Casablanca"
+            autoComplete="address-level2"
+          />
 
-              <Input
-                label="Quartier"
-                name="quartier"
-                value={form.quartier}
-                onChange={handleChange}
-                error={errors.quartier}
-                placeholder="Ex: Maârif"
-                autoComplete="address-level3"
-              />
-            </>
-          ) : (
-            <>
-              <Suspense
-                fallback={
-                  <div className="flex h-72 items-center justify-center rounded-xl border border-gray-200">
-                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                  </div>
-                }
-              >
-                <MapLocationPicker
-                  latitude={form.latitude}
-                  longitude={form.longitude}
-                  onSelect={handleMapSelect}
-                />
-              </Suspense>
-
-              {errors.coordinates ? (
-                <p className="text-xs font-medium text-red-600">
-                  {errors.coordinates}
-                </p>
-              ) : null}
-
-              {form.latitude != null && form.longitude != null ? (
-                <p className="rounded-xl border border-primary/30 bg-primary-soft px-3 py-2 text-xs font-semibold text-primary">
-                  Adresse estimée depuis la carte — vérifiez-la.
-                </p>
-              ) : null}
-
-              <Input
-                label="Ville"
-                name="city"
-                value={form.city}
-                onChange={handleChange}
-                error={errors.city}
-                placeholder="Ex: Casablanca"
-                autoComplete="address-level2"
-              />
-
-              <Input
-                label="Quartier"
-                name="quartier"
-                value={form.quartier}
-                onChange={handleChange}
-                error={errors.quartier}
-                placeholder="Ex: Maârif"
-                autoComplete="address-level3"
-              />
-            </>
-          )}
+          <Input
+            label="Quartier"
+            name="quartier"
+            value={form.quartier}
+            onChange={handleChange}
+            error={errors.quartier}
+            placeholder="Ex: Maârif"
+            autoComplete="address-level3"
+          />
 
           <div>
             <p className="mb-1.5 text-sm font-semibold text-gray-700">

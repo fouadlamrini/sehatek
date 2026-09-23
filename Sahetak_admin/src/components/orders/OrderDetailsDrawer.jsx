@@ -1,4 +1,4 @@
-import { MapPin, Navigation, Phone, User } from "lucide-react";
+import { MapPin, Phone, User } from "lucide-react";
 
 import Drawer from "../ui/Drawer";
 import Select from "../ui/Select";
@@ -78,25 +78,6 @@ const OrderDetailsDrawer = ({ open, onClose, order, onStatusChange, updating }) 
               value={LOCATION_TYPE_LABELS[delivery.locationType] ?? delivery.locationType ?? "-"}
             />
             <Row label="Receiver" value={delivery.receiverName || "-"} />
-
-            {delivery.latitude != null && delivery.longitude != null ? (
-              <div className="flex items-center justify-between gap-3 border-t border-gray-200 pt-3">
-                <span className="text-xs text-gray-400">
-                  {Number(delivery.latitude).toFixed(5)},{" "}
-                  {Number(delivery.longitude).toFixed(5)}
-                </span>
-
-                <a
-                  href={`https://www.google.com/maps/dir/?api=1&destination=${delivery.latitude},${delivery.longitude}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-primary/90"
-                >
-                  <Navigation className="h-3.5 w-3.5" />
-                  Suivre l'itinéraire
-                </a>
-              </div>
-            ) : null}
           </div>
         </section>
 

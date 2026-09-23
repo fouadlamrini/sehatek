@@ -108,8 +108,6 @@ const createOrder = async (req, res, next) => {
         quartier: delivery.quartier,
         locationType: delivery.locationType,
         receiverName: delivery.receiverName || "",
-        latitude: delivery.latitude ?? null,
-        longitude: delivery.longitude ?? null,
       },
 
       subtotal: orderTotals.subtotal,
@@ -246,14 +244,6 @@ const updateGuestOrder = async (req, res, next) => {
 
       if (delivery.receiverName !== undefined) {
         order.delivery.receiverName = delivery.receiverName;
-      }
-
-      if (
-        delivery.latitude != null &&
-        delivery.longitude != null
-      ) {
-        order.delivery.latitude = delivery.latitude;
-        order.delivery.longitude = delivery.longitude;
       }
     }
 

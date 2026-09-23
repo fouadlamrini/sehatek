@@ -54,6 +54,14 @@ const Products = () => {
   const allSelected =
     cards.length > 0 && cards.every((card) => selectedKeys.has(card.key));
 
+  const getRemainingStock = (product) => {
+    const inCart = items
+      .filter((item) => item.productId === product._id)
+      .reduce((sum, item) => sum + item.quantity, 0);
+
+    return Number(product.stock) - inCart;
+  };
+
   const loadData = useCallback(async () => {
     setLoading(true);
     setError("");
@@ -84,38 +92,70 @@ const Products = () => {
 
     if (selectedKeys.has(key)) {
       removeItem(key);
-    } else {
-      addItem(product, mealDay);
+      setStepError("");
+      return;
     }
 
-    setStepError("");
+    if (getRemainingStock(product) >= 1) {
+      addItem(product, mealDay);
+      setStepError("");
+    } else {
+      setStepError(`Stock insuffisant pour « ${product.name} ».`);
+    }
   };
 
   const handleAddPack = (pack) => {
+    const blocked = [];
+
     for (const product of pack.products ?? []) {
       const day = product.mealDays?.[0];
 
-      if (day) {
+      if (day && getRemainingStock(product) >= 1) {
         addItem(product, day);
+      } else if (day) {
+        blocked.push(product.name);
       }
     }
 
-    setStepError("");
+    const eligible = (pack.products ?? []).filter(
+      (product) => product.mealDays?.[0]
+    );
+
+    setStepError(
+      blocked.length > 0
+        ? `Stock insuffisant pour : ${[...new Set(blocked)].join(", ")}.${
+            blocked.length < eligible.length
+              ? " Les autres plats du pack ont été ajoutés."
+              : ""
+          }`
+        : ""
+    );
   };
 
   const handleSelectAll = () => {
     if (allSelected) {
       clearItems();
+      setStepError("");
       return;
     }
 
+    const blocked = [];
+
     for (const card of cards) {
       if (!selectedKeys.has(card.key)) {
-        addItem(card.product, card.mealDay);
+        if (getRemainingStock(card.product) >= 1) {
+          addItem(card.product, card.mealDay);
+        } else {
+          blocked.push(card.product.name);
+        }
       }
     }
 
-    setStepError("");
+    setStepError(
+      blocked.length > 0
+        ? `Stock insuffisant pour : ${[...new Set(blocked)].join(", ")}.`
+        : ""
+    );
   };
 
   const totals = pricing ? computeOrderTotals(pricing, items) : null;

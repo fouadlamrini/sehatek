@@ -71,16 +71,6 @@ const createOrderValidator = [
     .optional()
     .isString()
     .withMessage("Receiver name must be a string"),
-
-  body("delivery.latitude")
-    .optional({ values: "null" })
-    .isFloat({ min: -90, max: 90 })
-    .withMessage("Latitude must be between -90 and 90"),
-
-  body("delivery.longitude")
-    .optional({ values: "null" })
-    .isFloat({ min: -180, max: 180 })
-    .withMessage("Longitude must be between -180 and 180"),
 ];
 
 const updateOrderStatusValidator = [
@@ -141,16 +131,6 @@ const guestUpdateValidator = [
     .optional()
     .isString()
     .withMessage("Receiver name must be a string"),
-
-  body("delivery.latitude")
-    .optional({ values: "null" })
-    .isFloat({ min: -90, max: 90 })
-    .withMessage("Latitude must be between -90 and 90"),
-
-  body("delivery.longitude")
-    .optional({ values: "null" })
-    .isFloat({ min: -180, max: 180 })
-    .withMessage("Longitude must be between -180 and 180"),
 ];
 
 module.exports = {

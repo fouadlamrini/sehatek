@@ -21,7 +21,7 @@ export const validateCustomer = (customer) => {
   return errors;
 };
 
-export const validateDelivery = (delivery, { requireCoordinates = false } = {}) => {
+export const validateDelivery = (delivery) => {
   const errors = {};
 
   if (!delivery.city.trim()) {
@@ -34,14 +34,6 @@ export const validateDelivery = (delivery, { requireCoordinates = false } = {}) 
 
   if (!delivery.locationType) {
     errors.locationType = "Choisissez un type de livraison.";
-  }
-
-  if (
-    requireCoordinates &&
-    (delivery.latitude == null || delivery.longitude == null)
-  ) {
-    errors.coordinates =
-      "Placez le marqueur sur la carte pour choisir le point de livraison.";
   }
 
   return errors;

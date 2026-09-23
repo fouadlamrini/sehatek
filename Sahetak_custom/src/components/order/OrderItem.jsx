@@ -5,7 +5,10 @@ import { MAX_ITEM_QUANTITY } from "../../constants";
 import { formatCurrency } from "../../utils/formatters";
 
 const OrderItem = ({ item, unitPrice, onQuantityChange, onNoteChange, onRemove }) => {
-  const maxQty = MAX_ITEM_QUANTITY;
+  const stock = Number(item.stock);
+  const maxQty = Number.isFinite(stock)
+    ? Math.min(MAX_ITEM_QUANTITY, stock)
+    : MAX_ITEM_QUANTITY;
   const lineTotal = (unitPrice ?? item.unitPrice) * item.quantity;
 
   return (
