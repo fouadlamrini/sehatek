@@ -1,74 +1,113 @@
 import { useState } from "react";
-import { ChevronDown, HelpCircle } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
 
+import FaqImage from "../assets/faq.png";
 import { cn } from "../utils/cn";
 
 const FAQ_ITEMS = [
   {
-    q: "Wach momkin nakhed ghi l ayam li bghit wla darori simana kamla?",
-    a: "Momkin tkhetar l ayam li bghiti bnisba l simana kikon fiha discount.",
+    q: "واش نقدر نختار غير بعض الأيام؟",
+    a: "إيه، تقدر تختار غير الأيام اللي بغيتي. وإذا أخذت الأسبوع كامل فالاشتراك الدوري كيعطيك تخفيض.",
   },
   {
-    q: "Wach la Livraison gratuit?",
-    a: "Oui.",
+    q: "واش التوصيل مجاني؟",
+    a: "نعم، التوصيل مجاني على جميع الطلبات.",
   },
   {
-    q: "Wach kib9aw nefs les plats wla kitbdlo?",
-    a: "Kola semaine kikono fiha des plats 3la hasab l ikhtiyar dyalkom.",
+    q: "واش الطباش كيتبدلوا من أسبوع لآخر؟",
+    a: "كل أسبوع كاينة قائمة جديدة، حسب الاختيار ديال الزبناء.",
   },
   {
-    q: "Fo9ach kadiro la Livraison?",
-    a: "Bin 13:30 o 15:00.",
+    q: "إمتا كيتوصل الطلب؟",
+    a: "بين 13:30 و15:00.",
   },
   {
-    q: "Wach darori n commandé nhar 9bel?",
-    a: "Oui darori 7it kanchriw les ingredients dyal nhar 3la hasab les personnes li 3ndna bach katakloh frais.",
+    q: "واش خاصني نطلب من قبل؟",
+    a: "نعم، خاصك تطلب قبل نهار، حيت كنشريو مكونات النهار على حسب عدد الزبناء باش يكون كلشي طازج.",
   },
 ];
 
 const Faq = () => {
-  const [openIndex, setOpenIndex] = useState(null);
+  const [openIndex, setOpenIndex] = useState(0);
 
   return (
-    <section className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-          <HelpCircle className="h-5 w-5 text-primary" />
+    <section dir="rtl" className="w-full bg-cream py-14 sm:py-20">
+      <div className="mx-auto grid max-w-5xl gap-10 px-6 sm:px-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-16">
+        <div className="lg:pt-2">
+          <p className="text-xs font-extrabold tracking-[0.2em] text-primary">
+            نجيبو على أسئلتك
+          </p>
+
+          <h2 className="mt-4 text-4xl font-extrabold leading-tight text-forest sm:text-5xl">
+            الأسئلة الشائعة
+          </h2>
+
+          <p className="mt-5 max-w-sm text-sm leading-relaxed text-gray-600">
+            كل ما تحتاج معرفته قبل ما تسجل طلبك.
+          </p>
+
+          <img
+            src={FaqImage}
+            alt=""
+            aria-hidden="true"
+            className="mt-8 w-36 select-none sm:w-44"
+          />
         </div>
-        <h2 className="text-lg font-bold text-forest">
-          Questions fréquentes
-        </h2>
-      </div>
 
-      <div className="mt-3 divide-y divide-gray-100">
-        {FAQ_ITEMS.map((item, index) => {
-          const open = openIndex === index;
+        <ul className="space-y-4">
+          {FAQ_ITEMS.map((item, index) => {
+            const open = openIndex === index;
 
-          return (
-            <div key={item.q}>
-              <button
-                type="button"
-                onClick={() => setOpenIndex(open ? null : index)}
-                aria-expanded={open}
-                className="flex w-full items-center justify-between gap-3 py-3.5 text-left"
-              >
-                <span className="font-semibold text-gray-800">{item.q}</span>
-                <ChevronDown
+            return (
+              <li key={item.q}>
+                <div
                   className={cn(
-                    "h-4 w-4 shrink-0 text-gray-400 transition-transform duration-200",
-                    open && "rotate-180"
+                    "rounded-2xl border px-5 py-5 transition-colors duration-200 sm:px-6",
+                    open
+                      ? "border-primary bg-white shadow-[0_10px_30px_rgba(32,65,21,0.08)]"
+                      : "border-forest/10 bg-white/70 hover:border-forest/25"
                   )}
-                />
-              </button>
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpenIndex(open ? null : index)}
+                    aria-expanded={open}
+                    className="flex w-full cursor-pointer items-center gap-4"
+                  >
+                    <span className="shrink-0 font-serif text-sm font-semibold text-primary">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
 
-              {open ? (
-                <p className="pb-4 text-sm leading-relaxed text-gray-500">
-                  {item.a}
-                </p>
-              ) : null}
-            </div>
-          );
-        })}
+                    <span className="flex-1 text-base font-bold leading-snug text-forest sm:text-lg">
+                      {item.q}
+                    </span>
+
+                    <span
+                      className={cn(
+                        "flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors",
+                        open
+                          ? "bg-primary text-white"
+                          : "border border-forest/20 text-forest/70"
+                      )}
+                    >
+                      {open ? (
+                        <Minus className="h-5 w-5" strokeWidth={2} />
+                      ) : (
+                        <Plus className="h-5 w-5" strokeWidth={2} />
+                      )}
+                    </span>
+                  </button>
+
+                  {open ? (
+                    <p className="mt-4 pr-8 text-sm leading-relaxed text-gray-600 sm:text-base">
+                      {item.a}
+                    </p>
+                  ) : null}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       </div>
     </section>
   );

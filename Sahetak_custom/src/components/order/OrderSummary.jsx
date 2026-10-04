@@ -11,7 +11,7 @@ const OrderSummary = ({
   onNoteChange,
   onRemove,
   footer,
-  title = "Votre commande",
+  title = "طلبك",
 }) => {
   const finalPriceById = new Map();
 
@@ -24,14 +24,16 @@ const OrderSummary = ({
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
       <div className="flex items-center justify-between">
-        <h2 className="font-extrabold text-forest">{title}</h2>
+        <h2 dir="rtl" className="font-extrabold text-forest">
+          {title}
+        </h2>
 
         {pricingLoading ? <Spinner className="h-4 w-4" /> : null}
       </div>
 
       {items.length === 0 ? (
-        <p className="mt-3 rounded-xl border border-dashed border-gray-200 px-4 py-6 text-center text-sm text-gray-400">
-          Votre commande est vide.
+        <p dir="rtl" className="mt-3 rounded-xl border border-dashed border-gray-200 px-4 py-6 text-center text-sm text-gray-400">
+          الطلب ديالك فارغ.
         </p>
       ) : (
         <>
@@ -52,7 +54,7 @@ const OrderSummary = ({
             {totals ? (
               <>
                 <div className="flex justify-between text-gray-500">
-                  <span>Sous-total</span>
+                  <span>المجموع الفرعي</span>
                   <span className="font-semibold text-gray-700">
                     {formatCurrency(totals.subtotal)}
                   </span>
@@ -60,19 +62,19 @@ const OrderSummary = ({
 
                 {totals.discountAmount > 0 ? (
                   <div className="flex justify-between font-bold text-leaf">
-                    <span>Remise (packs / promos)</span>
+                    <span>الخصم (باقات / عروض)</span>
                     <span>- {formatCurrency(totals.discountAmount)}</span>
                   </div>
                 ) : null}
 
                 <div className="flex items-center justify-between border-t border-gray-100 pt-2 text-base font-extrabold text-forest">
-                  <span>Total</span>
+                  <span>المجموع</span>
                   <span>{formatCurrency(totals.totalPrice)}</span>
                 </div>
               </>
             ) : (
-              <p className="text-center text-xs text-gray-400">
-                Calcul du prix...
+              <p dir="rtl" className="text-center text-xs text-gray-400">
+                جارٍ حساب الثمن...
               </p>
             )}
           </div>

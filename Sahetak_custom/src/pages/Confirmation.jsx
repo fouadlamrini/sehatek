@@ -38,14 +38,16 @@ const buildPayload = (items, customer, delivery) => ({
 const RecapCard = ({ title, onEdit, children }) => (
   <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
     <div className="flex items-center justify-between">
-      <h3 className="text-sm font-bold text-forest">{title}</h3>
+      <h3 dir="rtl" className="text-sm font-bold text-forest">
+        {title}
+      </h3>
       <button
         type="button"
         onClick={onEdit}
-        className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+        className="inline-flex cursor-pointer items-center gap-1 text-xs font-semibold text-primary hover:underline"
       >
         <Pencil className="h-3.5 w-3.5" />
-        Modifier
+        تعديل
       </button>
     </div>
     <div className="mt-2 text-sm text-gray-600">{children}</div>
@@ -98,8 +100,8 @@ const Confirmation = () => {
       // Never dump raw server fields/validation to the client.
       setError(
         err?.response?.data?.errors
-          ? "Certaines informations sont invalides. Vérifiez vos champs."
-          : "Échec de l'envoi de la commande. Réessayez."
+          ? "بعض المعلومات غير صحيحة. المرجو مراجعة الحقول."
+          : "تعذر إرسال الطلب. المرجو إعادة المحاولة."
       );
     } finally {
       setSubmitting(false);
@@ -110,12 +112,12 @@ const Confirmation = () => {
     <StepLayout
       step={3}
       onBack={(index) => navigate(STEPS[index]?.path ?? "/")}
-      title="Confirmation"
-      subtitle="Vérifiez votre commande avant de valider"
+      title="التأكيد"
+      subtitle="راجع الطلب ديالك قبل ما تعمّق"
     >
       <div className="space-y-4">
         <OrderSummary
-          title="Votre commande"
+          title="طلبك"
           items={items}
           pricing={pricing}
           pricingLoading={pricingLoading}
@@ -124,28 +126,22 @@ const Confirmation = () => {
           onRemove={removeItem}
         />
 
-        <RecapCard
-          title="Client"
-          onEdit={() => navigate("/informations")}
-        >
+        <RecapCard title="الزبون" onEdit={() => navigate("/informations")}>
           <p className="font-semibold text-gray-800">{customer.name}</p>
           <p>{customer.phone}</p>
         </RecapCard>
 
-        <RecapCard
-          title="Livraison"
-          onEdit={() => navigate("/livraison")}
-        >
+        <RecapCard title="التوصيل" onEdit={() => navigate("/livraison")}>
           <p>
             {LOCATION_TYPE_LABELS[delivery.locationType] ?? delivery.locationType}
           </p>
+
           <p>
             {delivery.quartier}, {delivery.city}
           </p>
+
           {delivery.receiverName ? (
-            <p className="text-gray-400">
-              Reçu par : {delivery.receiverName}
-            </p>
+            <p className="text-gray-400">يستلمها: {delivery.receiverName}</p>
           ) : null}
         </RecapCard>
 
@@ -165,8 +161,8 @@ const Confirmation = () => {
           className="w-full"
         >
           {totalPrice !== null
-            ? `Confirmer la commande · ${formatCurrency(totalPrice)}`
-            : "Confirmer la commande"}
+            ? `تأكيد الطلب · ${formatCurrency(totalPrice)}`
+            : "تأكيد الطلب"}
         </Button>
       </div>
     </StepLayout>

@@ -7,14 +7,15 @@ const OrderProgress = ({ current, onNavigate }) => {
   const total = STEPS.length;
 
   return (
-    <div className="mx-auto max-w-5xl px-4 pt-5">
+    <div>
       {/* Mobile */}
       <div className="sm:hidden">
         <div className="mb-2 flex items-center justify-between text-sm">
-          <span className="font-bold text-forest">
-            Étape {current + 1} sur {total}
+          <span dir="rtl" className="font-bold text-forest">
+            الخطوة {current + 1} من {total}
           </span>
-          <span className="font-semibold text-primary">
+
+          <span dir="rtl" className="font-semibold text-primary">
             {STEPS[current].label}
           </span>
         </div>
@@ -28,56 +29,70 @@ const OrderProgress = ({ current, onNavigate }) => {
       </div>
 
       {/* Desktop */}
-      <ol className="hidden items-center sm:flex">
-        {STEPS.map((step, index) => {
-          const isDone = index < current;
-          const isActive = index === current;
-          const clickable = isDone && onNavigate;
+      <div className="hidden sm:block">
+        <ol className="flex items-start">
+          {STEPS.map((step, index) => {
+            const isDone = index < current;
+            const isActive = index === current;
+            const clickable = isDone && onNavigate;
 
-          return (
-            <li key={step.key} className="flex flex-1 items-center last:flex-none">
-              <button
-                type="button"
-                disabled={!clickable}
-                onClick={() => clickable && onNavigate(index)}
-                className={cn(
-                  "flex items-center gap-2",
-                  clickable ? "cursor-pointer" : "cursor-default"
-                )}
-              >
-                <span
+            return (
+              <li key={step.key} className="flex flex-1 items-start last:flex-none">
+                <button
+                  type="button"
+                  disabled={!clickable}
+                  onClick={() => clickable && onNavigate(index)}
                   className={cn(
-                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold transition",
-                    isDone && "border-leaf bg-leaf text-white",
-                    isActive && "border-primary bg-primary text-white",
-                    !isDone && !isActive && "border-gray-300 bg-white text-gray-400"
+                    "flex flex-col items-center gap-2",
+                    clickable ? "cursor-pointer" : "cursor-default"
                   )}
                 >
-                  {isDone ? <Check className="h-4 w-4" /> : index + 1}
-                </span>
+                  <span
+                    className={cn(
+                      "flex h-9 w-9 items-center justify-center rounded-full border text-sm font-bold transition",
+                      isDone && "border-leaf bg-leaf text-white",
+                      isActive && "border-primary bg-primary text-white",
+                      !isDone && !isActive && "border-gray-300 bg-white text-gray-400"
+                    )}
+                  >
+                    {isDone || isActive ? (
+                      <Check className="h-4 w-4" strokeWidth={3} />
+                    ) : (
+                      index + 1
+                    )}
+                  </span>
 
-                <span
-                  className={cn(
-                    "whitespace-nowrap text-sm font-semibold",
-                    isActive ? "text-forest" : "text-gray-400"
-                  )}
-                >
-                  {step.label}
-                </span>
-              </button>
+                  <span
+                    dir="rtl"
+                    className={cn(
+                      "whitespace-nowrap text-sm font-semibold",
+                      isActive ? "text-forest" : "text-gray-400"
+                    )}
+                  >
+                    {step.label}
+                  </span>
+                </button>
 
-              {index < total - 1 ? (
-                <span
-                  className={cn(
-                    "mx-3 h-0.5 flex-1 rounded",
-                    index < current ? "bg-leaf" : "bg-gray-200"
-                  )}
-                />
-              ) : null}
-            </li>
-          );
-        })}
-      </ol>
+                {index < total - 1 ? (
+                  <span
+                    className={cn(
+                      "mx-3 mt-[18px] h-0.5 flex-1 rounded",
+                      index < current ? "bg-leaf" : "bg-gray-200"
+                    )}
+                  />
+                ) : null}
+              </li>
+            );
+          })}
+        </ol>
+
+        <p
+          dir="rtl"
+          className="mt-6 border-t border-gray-100 pt-4 text-xs font-extrabold uppercase tracking-[0.25em] text-primary"
+        >
+          الخطوة {current + 1} من {total}
+        </p>
+      </div>
     </div>
   );
 };

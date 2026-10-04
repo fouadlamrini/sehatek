@@ -14,6 +14,7 @@ import {
 import * as orderApi from "../api/orderApi";
 
 import SiteHeader from "../components/layout/SiteHeader";
+import SiteFooter from "../components/layout/SiteFooter";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import Badge from "../components/ui/Badge";
@@ -25,7 +26,7 @@ import {
   ORDER_STATUS_LABELS,
   TRACK_STEPS,
 } from "../constants";
-import { formatCurrency } from "../utils/formatters";
+import { formatCurrency, formatDay } from "../utils/formatters";
 import { getErrorMessage } from "../utils/error";
 import { cn } from "../utils/cn";
 
@@ -79,7 +80,7 @@ const TrackOrder = () => {
 
   const handleSearch = useCallback(async () => {
     if (!form.trackingCode.trim() || !form.phone.trim()) {
-      setSearchError("Le code de suivi et le téléphone sont requis.");
+      setSearchError("كود التتبع ورقم الهاتف مطلوبين.");
       return;
     }
 
@@ -102,7 +103,7 @@ const TrackOrder = () => {
       setOrder(null);
       setTrackToken(null);
       setSearchError(
-        getErrorMessage(err, "Commande introuvable. Vérifiez vos informations.")
+        getErrorMessage(err, "الطلب غير موجود. المرجو مراجعة المعلومات.")
       );
     } finally {
       setSearching(false);
@@ -129,7 +130,7 @@ const TrackOrder = () => {
 
   const handleSave = async () => {
     if (!editForm.city.trim() || !editForm.quartier.trim()) {
-      setActionError("La ville et le quartier sont requis.");
+      setActionError("المدينة والحي مطلوبين.");
       return;
     }
 
@@ -159,7 +160,7 @@ const TrackOrder = () => {
       setEditing(false);
     } catch (err) {
       setActionError(
-        getErrorMessage(err, "Échec de la modification. Réessayez.")
+        getErrorMessage(err, "تعذر التعديل. المرجو إعادة المحاولة.")
       );
     } finally {
       setSaving(false);
@@ -187,7 +188,7 @@ const TrackOrder = () => {
       setCancelArmed(false);
     } catch (err) {
       setActionError(
-        getErrorMessage(err, "Échec de l'annulation. Réessayez.")
+        getErrorMessage(err, "تعذر إلغاء الطلب. المرجو إعادة المحاولة.")
       );
     } finally {
       setCancelling(false);
@@ -200,17 +201,17 @@ const TrackOrder = () => {
   const isCancelled = order?.status === "cancelled";
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-16">
+    <div className="flex min-h-screen flex-col bg-gray-50">
       <SiteHeader itemsCount={0} />
 
-      <main className="mx-auto max-w-xl px-4 pt-8">
+      <main className="mx-auto w-full max-w-xl flex-1 px-4 pt-8">
         <button
           type="button"
           onClick={() => navigate("/")}
           className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 transition hover:text-primary"
         >
           <ArrowLeft className="h-4 w-4" />
-          Retour au menu
+          <span dir="rtl">العودة للقائمة</span>
         </button>
 
         {!order ? (
@@ -221,10 +222,10 @@ const TrackOrder = () => {
               </div>
               <div>
                 <h1 className="text-xl font-extrabold text-forest">
-                  Suivre ma commande
+                  تتبع الطلب ديالي
                 </h1>
                 <p className="text-sm text-gray-500">
-                  Entrez votre code de suivi et votre téléphone
+                  أدخل كود التتبع ورقم الهاتف ديالك
                 </p>
               </div>
             </div>
@@ -237,16 +238,16 @@ const TrackOrder = () => {
               }}
             >
               <Input
-                label="Code de suivi"
+                label="كود التتبع"
                 name="trackingCode"
                 value={form.trackingCode}
                 onChange={handleChange}
-                placeholder="Ex: STK-1A2B3C4D5"
+                placeholder="مثال: STK-1A2B3C4D5"
                 autoCapitalize="characters"
               />
 
               <Input
-                label="Téléphone"
+                label="رقم الهاتف"
                 name="phone"
                 type="tel"
                 value={form.phone}
@@ -268,7 +269,7 @@ const TrackOrder = () => {
                 icon={PackageSearch}
                 className="w-full"
               >
-                Retrouver ma commande
+                البحث عن الطلب
               </Button>
             </form>
           </div>
@@ -283,7 +284,7 @@ const TrackOrder = () => {
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
-                    Commande
+                    الطلب
                   </p>
                   <p className="text-lg font-extrabold text-primary">
                     {order.trackingCode}
@@ -299,8 +300,7 @@ const TrackOrder = () => {
                 <div className="mt-4 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
                   <XCircle className="mt-0.5 h-4 w-4 shrink-0" />
                   <span>
-                    Cette commande a été annulée. Les produits ont été remis en
-                    stock.
+                    تم إلغاء هذا الطلب. رجعات المنتجات للمخزون.
                   </span>
                 </div>
               ) : (
@@ -346,8 +346,8 @@ const TrackOrder = () => {
               )}
 
               <p className="mt-4 text-center text-xs text-gray-400">
-                Passée le{" "}
-                {new Date(order.createdAt).toLocaleDateString("fr-FR", {
+                تم الطلب في{" "}
+                {new Date(order.createdAt).toLocaleDateString("ar-MA", {
                   day: "numeric",
                   month: "long",
                   hour: "2-digit",
@@ -358,7 +358,7 @@ const TrackOrder = () => {
 
             {/* Items */}
             <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-              <h2 className="text-sm font-bold text-forest">Votre commande</h2>
+              <h2 className="text-sm font-bold text-forest">طلبك</h2>
 
               <ul className="mt-2 divide-y divide-gray-100">
                 {order.items.map((item) => {
@@ -377,9 +377,11 @@ const TrackOrder = () => {
 
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-bold text-gray-800">
-                          {product.name ?? "Produit"}
+                          {product.name ?? "طبق"}
                         </p>
-                        <p className="text-xs font-semibold text-primary">{item.mealDay}</p>
+                        <p dir="rtl" className="text-xs font-semibold text-primary">
+                          {formatDay(item.mealDay)}
+                        </p>
                         <p className="text-xs text-gray-400">x{item.quantity}</p>
                       </div>
 
@@ -393,19 +395,19 @@ const TrackOrder = () => {
 
               <div className="mt-2 space-y-1.5 border-t border-gray-100 pt-3 text-sm">
                 <div className="flex justify-between text-gray-500">
-                  <span>Sous-total</span>
+                  <span>المجموع الفرعي</span>
                   <span>{formatCurrency(order.subtotal)}</span>
                 </div>
 
                 {order.discount > 0 ? (
                   <div className="flex justify-between text-gray-500">
-                    <span>Remise</span>
+                    <span>الخصم</span>
                     <span className="text-leaf">-{formatCurrency(order.discount)}</span>
                   </div>
                 ) : null}
 
                 <div className="flex items-center justify-between border-t border-gray-100 pt-2 text-base font-extrabold text-forest">
-                  <span>Total</span>
+                  <span>المجموع</span>
                   <span>{formatCurrency(order.totalPrice)}</span>
                 </div>
               </div>
@@ -413,7 +415,7 @@ const TrackOrder = () => {
 
             {/* Delivery / customer */}
             <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-              <h2 className="text-sm font-bold text-forest">Livraison</h2>
+              <h2 className="text-sm font-bold text-forest">التوصيل</h2>
 
               <div className="mt-3 flex items-start gap-2 text-sm text-gray-600">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
@@ -425,18 +427,18 @@ const TrackOrder = () => {
                     {order.delivery?.quartier}, {order.delivery?.city}
                   </p>
                   {order.delivery?.receiverName ? (
-                    <p className="text-gray-400">Reçu par : {order.delivery.receiverName}</p>
+                    <p className="text-gray-400">يستلمها: {order.delivery.receiverName}</p>
                   ) : null}
                 </div>
               </div>
 
               <div className="mt-3 border-t border-gray-100 pt-3 text-sm text-gray-600">
                 <p>
-                  <span className="text-gray-400">Client : </span>
+                  <span className="text-gray-400">الزبون: </span>
                   <span className="font-semibold text-gray-800">{order.customer?.name}</span>
                 </p>
                 <p>
-                  <span className="text-gray-400">Téléphone : </span>
+                  <span className="text-gray-400">الهاتف: </span>
                   <span className="font-semibold text-gray-800">{order.customer?.phone}</span>
                 </p>
               </div>
@@ -454,19 +456,19 @@ const TrackOrder = () => {
                 {editing ? (
                   <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
                     <h2 className="text-sm font-bold text-forest">
-                      Modifier ma commande
+                      تعديل الطلب ديالي
                     </h2>
 
                     <div className="mt-4 space-y-4">
                       <Input
-                        label="Nom"
+                        label="الاسم"
                         name="customerName"
                         value={editForm.customerName}
                         onChange={handleEditChange}
                       />
 
                       <Input
-                        label="Nouveau téléphone"
+                        label="رقم هاتف جديد"
                         name="newPhone"
                         type="tel"
                         value={editForm.newPhone}
@@ -475,19 +477,19 @@ const TrackOrder = () => {
                       />
 
                       <Input
-                        label="Ville"
+                        label="المدينة"
                         name="city"
                         value={editForm.city}
                         onChange={handleEditChange}
-                        error={!editForm.city.trim() ? "La ville est requise" : undefined}
+                        error={!editForm.city.trim() ? "المدينة مطلوبة" : undefined}
                       />
 
                       <Input
-                        label="Quartier"
+                        label="الحي"
                         name="quartier"
                         value={editForm.quartier}
                         onChange={handleEditChange}
-                        error={!editForm.quartier.trim() ? "Le quartier est requis" : undefined}
+                        error={!editForm.quartier.trim() ? "الحي مطلوب" : undefined}
                       />
 
                       <div>
@@ -495,7 +497,7 @@ const TrackOrder = () => {
                           htmlFor="trackLocationType"
                           className="mb-1.5 block text-sm font-semibold text-gray-700"
                         >
-                          Type de livraison
+                          نوع التوصيل
                         </label>
                         <select
                           id="trackLocationType"
@@ -513,11 +515,11 @@ const TrackOrder = () => {
                       </div>
 
                       <Input
-                        label="Reçu par"
+                        label="يستلمها"
                         name="receiverName"
                         value={editForm.receiverName}
                         onChange={handleEditChange}
-                        placeholder="(optionnel)"
+                        placeholder="(اختياري)"
                       />
                     </div>
 
@@ -527,7 +529,7 @@ const TrackOrder = () => {
                         onClick={handleEditCancel}
                         className="flex-1"
                       >
-                        Annuler
+                        إلغاء
                       </Button>
                       <Button
                         variant="leaf"
@@ -536,7 +538,7 @@ const TrackOrder = () => {
                         onClick={handleSave}
                         className="flex-1"
                       >
-                        Enregistrer
+                        حفظ
                       </Button>
                     </div>
                   </div>
@@ -548,7 +550,7 @@ const TrackOrder = () => {
                       onClick={() => setEditing(true)}
                       className="w-full"
                     >
-                      Modifier la livraison
+                      تعديل التوصيل
                     </Button>
 
                     <Button
@@ -559,13 +561,13 @@ const TrackOrder = () => {
                       className="w-full"
                     >
                       {cancelArmed
-                        ? "Confirmer l'annulation"
-                        : "Annuler la commande"}
+                        ? "تأكيد الإلغاء"
+                        : "إلغاء الطلب"}
                     </Button>
 
                     {cancelArmed ? (
                       <p className="text-center text-xs text-gray-400">
-                        Cliquez à nouveau pour confirmer l&apos;annulation.
+                        إضغط مرة أخرى للتأكيد على الإلغاء.
                       </p>
                     ) : null}
                   </div>
@@ -576,13 +578,16 @@ const TrackOrder = () => {
             <button
               type="button"
               onClick={handleNewSearch}
-              className="w-full text-center text-sm font-semibold text-gray-500 transition hover:text-primary"
+              dir="rtl"
+              className="w-full cursor-pointer text-center text-sm font-semibold text-gray-500 transition hover:text-primary"
             >
-              Rechercher une autre commande
+              البحث عن طلب آخر
             </button>
           </div>
         )}
       </main>
+
+      <SiteFooter />
     </div>
   );
 };

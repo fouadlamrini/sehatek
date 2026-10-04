@@ -43,12 +43,12 @@ const PackCard = ({ pack, onAdd, onImageClick }) => {
 
         <span className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-leaf px-2.5 py-1 text-xs font-extrabold text-white shadow-md">
           <Gift className="h-3.5 w-3.5" />
-          Pack
+          باقة
         </span>
 
         {unavailable ? (
           <span className="absolute right-2 top-2 rounded-full bg-red-600 px-2.5 py-1 text-xs font-extrabold text-white shadow-md">
-            Indisponible
+            غير متوفرة
           </span>
         ) : discount > 0 ? (
           <span className="absolute right-2 top-2 rounded-full bg-primary px-2.5 py-1 text-xs font-extrabold text-white shadow-md">
@@ -74,9 +74,11 @@ const PackCard = ({ pack, onAdd, onImageClick }) => {
         <button
           type="button"
           onClick={() => setIsOpen((value) => !value)}
-          className="mt-3 flex items-center gap-1 text-xs font-bold text-primary hover:underline"
+          className="mt-3 flex cursor-pointer items-center gap-1 text-xs font-bold text-primary hover:underline"
         >
-          {isOpen ? "Masquer les produits" : `Voir les produits (${products.length})`}
+          {isOpen
+            ? "إخفاء الأطباق"
+            : `شوف الأطباق (${products.length})`}
           <ChevronDown
             className={cn("h-3.5 w-3.5 transition-transform", isOpen && "rotate-180")}
           />
@@ -110,7 +112,7 @@ const PackCard = ({ pack, onAdd, onImageClick }) => {
                   )}
                 >
                   {Number(product.stock) <= 0
-                    ? "Rupture"
+                    ? "نفدت"
                     : formatCurrency(product.price)}
                 </span>
               </li>
@@ -126,7 +128,7 @@ const PackCard = ({ pack, onAdd, onImageClick }) => {
           onClick={() => onAdd(pack)}
           className="mt-3 w-full"
         >
-          {unavailable ? "Indisponible" : "Ajouter le pack"}
+          {unavailable ? "غير متوفرة" : "زيد الباقة"}
         </Button>
       </div>
     </article>

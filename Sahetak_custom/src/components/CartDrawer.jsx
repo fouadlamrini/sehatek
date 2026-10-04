@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, ShoppingBag, X } from "lucide-react";
+import { ArrowLeft, ShoppingBag, X } from "lucide-react";
 
 import OrderItem from "./order/OrderItem";
 import Button from "./ui/Button";
@@ -76,16 +76,16 @@ const CartDrawer = ({ open, onClose }) => {
       <aside
         role="dialog"
         aria-modal="true"
-        aria-label="Mon panier"
+        aria-label="سلتي"
         className={cn(
           "absolute inset-y-0 right-0 flex w-full max-w-md flex-col bg-white shadow-2xl transition-transform duration-300",
           open ? "translate-x-0" : "translate-x-full"
         )}
       >
         <header className="flex items-center justify-between border-b border-gray-100 px-4 py-4">
-          <h2 className="flex items-center gap-2 text-lg font-bold text-forest">
+          <h2 dir="rtl" className="flex items-center gap-2 text-lg font-bold text-forest">
             <ShoppingBag className="h-5 w-5 text-primary" />
-            Mon Panier
+            السلة ديالي
             {itemsCount > 0 ? (
               <span className="rounded-full bg-primary-soft px-2 py-0.5 text-xs font-bold text-primary">
                 {itemsCount}
@@ -96,8 +96,8 @@ const CartDrawer = ({ open, onClose }) => {
           <button
             type="button"
             onClick={onClose}
-            aria-label="Fermer le panier"
-            className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+            aria-label="سد السلة"
+            className="cursor-pointer rounded-lg p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
           >
             <X className="h-5 w-5" />
           </button>
@@ -106,19 +106,22 @@ const CartDrawer = ({ open, onClose }) => {
         {empty ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
             <ShoppingBag className="h-12 w-12 text-gray-300" />
-            <p className="font-semibold text-gray-600">
-              Votre panier est vide
+
+            <p dir="rtl" className="font-semibold text-gray-600">
+              السلة ديالك فارغة
             </p>
-            <p className="text-sm text-gray-400">
-              Sélectionnez des plats depuis le menu pour commencer.
+
+            <p dir="rtl" className="text-sm text-gray-400">
+              اختار شي أطباق من القائمة باش تبدا.
             </p>
+
             <Button
               onClick={() => {
                 onClose();
                 navigate("/");
               }}
             >
-              Voir le menu
+              شوف القائمة
             </Button>
           </div>
         ) : (
@@ -139,7 +142,7 @@ const CartDrawer = ({ open, onClose }) => {
             <footer className="space-y-3 border-t border-gray-100 px-4 py-4 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
               <div className="space-y-1.5 text-sm">
                 <div className="flex justify-between text-gray-600">
-                  <span>Sous-total:</span>
+                  <span>المجموع الفرعي:</span>
                   <span className="font-semibold">
                     {formatCurrency(totals?.subtotal ?? 0)}
                   </span>
@@ -147,13 +150,13 @@ const CartDrawer = ({ open, onClose }) => {
 
                 {totals && totals.discountAmount > 0 ? (
                   <div className="flex justify-between font-bold text-leaf">
-                    <span>Remise (packs / promos):</span>
+                    <span>الخصم (باقات / عروض):</span>
                     <span>- {formatCurrency(totals.discountAmount)}</span>
                   </div>
                 ) : null}
 
                 <div className="flex justify-between border-t pt-2 text-lg font-black text-forest">
-                  <span>Total:</span>
+                  <span>المجموع</span>
                   <span>
                     {pricingLoading && !totals
                       ? "..."
@@ -167,8 +170,8 @@ const CartDrawer = ({ open, onClose }) => {
                 onClick={handleNext}
                 className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-leaf py-3.5 text-base font-bold text-white shadow-lg transition duration-200 hover:bg-forest"
               >
-                Suivant
-                <ArrowRight className="h-5 w-5" />
+                متابعة
+                <ArrowLeft className="h-5 w-5" />
               </button>
             </footer>
           </>

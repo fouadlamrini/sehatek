@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, User } from "lucide-react";
+import { ArrowLeft, User } from "lucide-react";
 
 import StepLayout from "../components/layout/StepLayout";
 import Button from "../components/ui/Button";
@@ -47,8 +47,8 @@ const CustomerInfo = () => {
     <StepLayout
       step={1}
       onBack={(index) => navigate(STEPS[index]?.path ?? "/")}
-      title="Vos informations"
-      subtitle="Pour vous contacter au sujet de votre commande"
+      title="معلوماتك"
+      subtitle="باش نعيطو عليك بخصوص الطلب ديالك"
     >
       <form
         onSubmit={handleSubmit}
@@ -56,35 +56,37 @@ const CustomerInfo = () => {
       >
         <div className="mb-4 flex items-center gap-2 text-primary">
           <User className="h-5 w-5" />
-          <span className="text-sm font-bold">Coordonnées</span>
+          <span dir="rtl" className="text-sm font-bold">
+            معطيات التواصل
+          </span>
         </div>
 
         <div className="space-y-4">
           <Input
-            label="Nom complet"
+            label="الاسم الكامل"
             name="name"
             value={form.name}
             onChange={handleChange}
             error={errors.name}
-            placeholder="Ex: Youssef El Amrani"
+            placeholder="مثال: يوسف العمراني"
             autoComplete="name"
           />
 
           <Input
-            label="Téléphone"
+            label="رقم الهاتف"
             name="phone"
             type="tel"
             value={form.phone}
             onChange={handleChange}
             error={errors.phone}
-            hint="Format: 0612345678"
+            hint="الصيغة: 0612345678"
             placeholder="0612345678"
             autoComplete="tel"
           />
         </div>
 
-        <Button type="submit" icon={ArrowRight} className="mt-6 w-full">
-          Continuer
+        <Button type="submit" icon={ArrowLeft} className="mt-6 w-full">
+          متابعة
         </Button>
       </form>
     </StepLayout>

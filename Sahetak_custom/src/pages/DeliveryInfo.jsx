@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, MapPin } from "lucide-react";
+import { ArrowLeft, MapPin } from "lucide-react";
 
 import StepLayout from "../components/layout/StepLayout";
 import Button from "../components/ui/Button";
@@ -55,8 +55,8 @@ const DeliveryInfo = () => {
     <StepLayout
       step={2}
       onBack={(index) => navigate(STEPS[index]?.path ?? "/")}
-      title="Livraison"
-      subtitle="Où souhaitez-vous recevoir votre commande ?"
+      title="التوصيل"
+      subtitle="فين بغيتي توصّل الطلب ديالك؟"
     >
       <form
         onSubmit={handleSubmit}
@@ -64,33 +64,35 @@ const DeliveryInfo = () => {
       >
         <div className="mb-4 flex items-center gap-2 text-primary">
           <MapPin className="h-5 w-5" />
-          <span className="text-sm font-bold">Adresse de livraison</span>
+          <span dir="rtl" className="text-sm font-bold">
+            عنوان التوصيل
+          </span>
         </div>
 
         <div className="space-y-4">
           <Input
-            label="Ville"
+            label="المدينة"
             name="city"
             value={form.city}
             onChange={handleChange}
             error={errors.city}
-            placeholder="Ex: Casablanca"
+            placeholder="مثال: الدار البيضاء"
             autoComplete="address-level2"
           />
 
           <Input
-            label="Quartier"
+            label="الحي"
             name="quartier"
             value={form.quartier}
             onChange={handleChange}
             error={errors.quartier}
-            placeholder="Ex: Maârif"
+            placeholder="مثال: المعاريف"
             autoComplete="address-level3"
           />
 
           <div>
-            <p className="mb-1.5 text-sm font-semibold text-gray-700">
-              Type de lieu
+            <p dir="rtl" className="mb-1.5 text-sm font-semibold text-gray-700">
+              نوع المكان
             </p>
 
             <div className="grid grid-cols-2 gap-2">
@@ -133,17 +135,17 @@ const DeliveryInfo = () => {
           </div>
 
           <Input
-            label="Nom du récepteur (optionnel)"
+            label="اسم المستلم (اختياري)"
             name="receiverName"
             value={form.receiverName}
             onChange={handleChange}
             error={errors.receiverName}
-            placeholder="Si quelqu'un d'autre reçoit la commande"
+            placeholder="إلا كان شي حد آخر غادي يستلم الطلب"
           />
         </div>
 
-        <Button type="submit" icon={ArrowRight} className="mt-6 w-full">
-          Continuer
+        <Button type="submit" icon={ArrowLeft} className="mt-6 w-full">
+          متابعة
         </Button>
       </form>
     </StepLayout>

@@ -1,6 +1,16 @@
-
 import { useEffect, useRef, useState } from "react";
+
 import slide from "../data/silde";
+
+// Marquee geometry — CARD_WIDTH and GAP must match the classes on the track
+// below, since the loop length is derived from them.
+const CARD_WIDTH = 264;
+const GAP = 32;
+const SPEED = 0.7;
+
+// Fixed per-slot tilt: the list is rendered twice to loop, so the angle is
+// keyed on the slot index to keep the scattered look stable across re-renders.
+const TILTS = [-4, 2.5, -1.5, 4, -3, 1, -5, 3, -2, 4.5];
 
 function Slide() {
   const sliderRef = useRef(null);
@@ -8,10 +18,6 @@ function Slide() {
 
   const [isPlaying, setIsPlaying] = useState(true);
   const [isDesktop, setIsDesktop] = useState(false);
-
-  const GAP = 16;
-  const IMAGE_WIDTH = 220;
-  const SPEED = 0.7;
 
   // Détecter PC / mobile
   useEffect(() => {
@@ -42,7 +48,7 @@ function Slide() {
       if (isPlaying) {
         slider.scrollLeft += SPEED;
 
-        const oneSetWidth = slide.length * (IMAGE_WIDTH + GAP);
+        const oneSetWidth = slide.length * (CARD_WIDTH + GAP);
 
         if (slider.scrollLeft >= oneSetWidth) {
           slider.scrollLeft -= oneSetWidth;
@@ -81,73 +87,41 @@ function Slide() {
   };
 
   return (
-    <section className="w-full py-12">
-
-      {/* Titre avec cadre */}
-      <div className="mb-8 flex justify-center px-4">
-        <h2
-          className="
-            rounded-xl
-            border-2 border-[#649714]
-            bg-white
-            px-6 py-3
-            text-center
-            text-2xl font-bold
-            text-[#204115]
-            shadow-md
-            sm:px-8 sm:py-4
-            sm:text-3xl
-          "
-        >
-          Les commandes de nos clients
+    <section className="w-full overflow-hidden bg-cream py-12 sm:py-16">
+      <div className="mb-10 flex justify-center px-4">
+        <h2 dir="rtl" className="text-center font-serif text-3xl font-medium text-forest sm:text-4xl">
+          طلبات زبنائنا
         </h2>
       </div>
 
-      {/* Slider */}
       <div className="relative w-full">
         <div
           ref={sliderRef}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           onClick={handleClick}
-          className="
-            flex w-full
-            gap-4
-            overflow-hidden
-            bg-[#204115]
-            px-4 py-8
-            select-none
-          "
+          className="flex w-full items-center gap-8 overflow-hidden py-8 select-none"
         >
-          {[...slide, ...slide].map((image, index) => (
-            <div
+          {[...slide, ...slide].map((item, index) => (
+            <figure
               key={index}
-              className="
-                w-[220px]
-                min-w-[220px]
-                shrink-0
-                overflow-hidden
-                rounded-xl
-                border-4
-                border-[#649714]
-                bg-white
-                shadow-lg
-                transition
-                duration-300
-                hover:border-[#E58730]
-              "
+              style={{
+                width: CARD_WIDTH,
+                transform: `rotate(${TILTS[index % TILTS.length]}deg)`,
+              }}
+              className="shrink-0 bg-white p-2 pb-4 shadow-[0_12px_32px_rgba(32,65,21,0.14)] transition-transform duration-300 hover:scale-105"
             >
               <img
-                src={image}
-                alt={`Commande client ${(index % slide.length) + 1}`}
+                src={item.src}
+                alt={item.caption}
                 draggable="false"
-                className="
-                  h-[280px]
-                  w-full
-                  object-cover
-                "
+                className="aspect-[4/3] w-full bg-gray-100 object-cover"
               />
-            </div>
+
+              <figcaption className="mt-1.5 truncate px-1 text-center font-script text-xl leading-tight text-forest">
+                {item.caption}
+              </figcaption>
+            </figure>
           ))}
         </div>
       </div>

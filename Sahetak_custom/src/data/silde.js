@@ -35,6 +35,47 @@ import image34 from "../assets/slide/image34.jpeg";
 import image35 from "../assets/slide/image35.jpeg";
 import image36 from "../assets/slide/image36.jpeg";
 
+// Captions are indexed to match the image imports above — same order, same
+// length. They render in the handwriting face under each polaroid frame.
+const captions = [
+  "Une cuisine qui sent bon",
+  "Tajine du vendredi",
+  "Recette de grand-mère",
+  "Poulet à la beldi",
+  "Le bon du dimanche",
+  "Couscous royal",
+  "Madfouna maison",
+  "Brochettes minute",
+  "Kebda mechrmla",
+  "Paella party",
+  "Le feu de bois",
+  "Cuisine de maison",
+  "Le plat signature",
+  "Mijoté à la braise",
+  "Fraîcheur du marché",
+  "Table dressée",
+  "Saveurs d'antan",
+  "Déjeuner parfait",
+  "Le temps des plats",
+  "Nos meilleurs plats",
+  "Épicerie fine",
+  "Le sourire en bouche",
+  "Couleurs du soleil",
+  "Douceurs maison",
+  "Chemin de table",
+  "L'ardoise du chef",
+  "Casseroles en cuivre",
+  "Le jardin du mois",
+  "Cuisson lente",
+  "Assiette du jour",
+  "Herbes fraîches",
+  "Rythme des saisons",
+  "Pot-au-feu",
+  "Le dernier plat",
+  "À table",
+  "Sahetak",
+];
+
 const slide = [
   image1,
   image2,
@@ -72,6 +113,6 @@ const slide = [
   image34,
   image35,
   image36,
-];
+].map((src, index) => ({ src, caption: captions[index] }));
 
 export default slide;

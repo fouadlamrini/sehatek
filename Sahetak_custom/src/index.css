@@ -7,7 +7,13 @@
   --color-leaf: #649714;
   --color-leaf-soft: #eef5e2;
   --color-forest: #204115;
-  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* The two dark brand greens: app chrome (navbar, FAQ, footer, sticky bar). */
+  --color-forest-deep: #14290d;
+  --color-ink: #0e1613;
+  --color-cream: #f2ede4;
+  --font-sans: "Inter", "Tajawal", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "Playfair Display", "Tajawal", Georgia, "Times New Roman", serif;
+  --font-script: "Dancing Script", "Tajawal", cursive;
 }
 
 html {

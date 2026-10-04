@@ -2,7 +2,7 @@ import { Trash2 } from "lucide-react";
 
 import QuantityStepper from "../ui/QuantityStepper";
 import { MAX_ITEM_QUANTITY } from "../../constants";
-import { formatCurrency } from "../../utils/formatters";
+import { formatCurrency, formatDay } from "../../utils/formatters";
 
 const OrderItem = ({ item, unitPrice, onQuantityChange, onNoteChange, onRemove }) => {
   const stock = Number(item.stock);
@@ -23,14 +23,16 @@ const OrderItem = ({ item, unitPrice, onQuantityChange, onNoteChange, onRemove }
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <p className="truncate font-bold text-gray-800">{item.name}</p>
-            <p className="text-xs font-semibold text-primary">{item.mealDay}</p>
+            <p dir="rtl" className="text-xs font-semibold text-primary">
+              {formatDay(item.mealDay)}
+            </p>
           </div>
 
           <button
             type="button"
             onClick={() => onRemove(item.key)}
-            aria-label="Retirer"
-            className="shrink-0 rounded-lg p-1 text-gray-400 transition hover:bg-red-50 hover:text-red-600"
+            aria-label="حذف"
+            className="shrink-0 cursor-pointer rounded-lg p-1 text-gray-400 transition hover:bg-red-50 hover:text-red-600"
           >
             <Trash2 className="h-4 w-4" />
           </button>
@@ -53,7 +55,7 @@ const OrderItem = ({ item, unitPrice, onQuantityChange, onNoteChange, onRemove }
           type="text"
           value={item.note}
           onChange={(event) => onNoteChange(item.key, event.target.value)}
-          placeholder="Note (ex: sans oignon)"
+          placeholder="ملاحظة (مثال: بدون بصل)"
           maxLength={200}
           className="mt-2 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs outline-none transition focus:border-primary focus:bg-white"
         />

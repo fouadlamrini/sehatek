@@ -1,2 +1,2 @@
-export const getErrorMessage = (error, fallback = "Une erreur est survenue.") =>
+export const getErrorMessage = (error, fallback = "حدث خطأ ما.") =>
   error?.response?.data?.message || error?.message || fallback;

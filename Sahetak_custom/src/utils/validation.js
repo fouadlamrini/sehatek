@@ -9,13 +9,13 @@ export const validateCustomer = (customer) => {
   const errors = {};
 
   if (!customer.name.trim()) {
-    errors.name = "Le nom est obligatoire.";
+    errors.name = "الاسم الكامل مطلوب.";
   }
 
   if (!customer.phone.trim()) {
-    errors.phone = "Le téléphone est obligatoire.";
+    errors.phone = "رقم الهاتف مطلوب.";
   } else if (!isValidPhone(customer.phone)) {
-    errors.phone = "Numéro invalide (ex: 0612345678).";
+    errors.phone = "رقم غير صحيح (مثال: 0612345678).";
   }
 
   return errors;
@@ -25,15 +25,15 @@ export const validateDelivery = (delivery) => {
   const errors = {};
 
   if (!delivery.city.trim()) {
-    errors.city = "La ville est obligatoire.";
+    errors.city = "المدينة مطلوبة.";
   }
 
   if (!delivery.quartier.trim()) {
-    errors.quartier = "Le quartier est obligatoire.";
+    errors.quartier = "الحي مطلوب.";
   }
 
   if (!delivery.locationType) {
-    errors.locationType = "Choisissez un type de livraison.";
+    errors.locationType = "اختر نوع التوصيل.";
   }
 
   return errors;

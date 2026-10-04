@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AlertTriangle, RefreshCw } from "lucide-react";
+import { AlertTriangle, ArrowLeft, RefreshCw } from "lucide-react";
 
 import * as productApi from "../api/productApi";
 import * as packApi from "../api/packApi";
@@ -9,7 +9,7 @@ import Header from "../components/Header";
 import Slide from "../components/Slide";
 import Faq from "../components/Faq";
 import SiteHeader from "../components/layout/SiteHeader";
-import OrderProgress from "../components/order/OrderProgress";
+import SiteFooter from "../components/layout/SiteFooter";
 import ProductGrid from "../components/products/ProductGrid";
 import PackSection from "../components/packs/PackSection";
 import Button from "../components/ui/Button";
@@ -77,7 +77,7 @@ const Products = () => {
       setPacks(packsRes.data);
     } catch (err) {
       setError(
-        getErrorMessage(err, "Impossible de charger le menu. Veuillez réessayer.")
+        getErrorMessage(err, "تعذر تحميل القائمة. المرجو إعادة المحاولة.")
       );
     } finally {
       setLoading(false);
@@ -101,7 +101,7 @@ const Products = () => {
       addItem(product, mealDay);
       setStepError("");
     } else {
-      setStepError(`Stock insuffisant pour « ${product.name} ».`);
+      setStepError(`الكمية المتوفرة من «${product.name}» غير كافية.`);
     }
   };
 
@@ -124,9 +124,9 @@ const Products = () => {
 
     setStepError(
       blocked.length > 0
-        ? `Stock insuffisant pour : ${[...new Set(blocked)].join(", ")}.${
+        ? `الكمية غير كافية لـ: ${[...new Set(blocked)].join("، ")}.${
             blocked.length < eligible.length
-              ? " Les autres plats du pack ont été ajoutés."
+              ? " تم إضافة باقي أطباق الباقة."
               : ""
           }`
         : ""
@@ -154,7 +154,7 @@ const Products = () => {
 
     setStepError(
       blocked.length > 0
-        ? `Stock insuffisant pour : ${[...new Set(blocked)].join(", ")}.`
+        ? `الكمية غير كافية لـ: ${[...new Set(blocked)].join("، ")}.`
         : ""
     );
   };
@@ -163,7 +163,7 @@ const Products = () => {
 
   const handleNext = () => {
     if (items.length === 0) {
-      setStepError("Veuillez sélectionner au moins un plat avant de continuer.");
+      setStepError("المرجو اختيار طبق واحد على الأقل قبل المتابعة.");
       return;
     }
 
@@ -171,112 +171,160 @@ const Products = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-16">
+    <div className="flex min-h-screen flex-col bg-gray-50">
       <SiteHeader itemsCount={itemsCount} />
+
+      {/* 1. Navbar + hero (dark green) */}
 
       <Header />
 
-      <div className="mx-auto max-w-4xl space-y-6 p-4 sm:p-6">
-        <div className="flex justify-center">
-          <h2 className="rounded-xl border-2 border-leaf bg-white px-6 py-3 text-center text-2xl font-bold text-forest shadow-md sm:px-8 sm:py-4 sm:text-3xl">
-            Menu de la Semaine
-          </h2>
-        </div>
+      {/* 2. Social proof — customer photos, up top to build trust */}
 
-        <OrderProgress current={0} />
+      <Slide />
 
+      <div className="flex-1">
         {loading ? (
-          <div className="flex flex-col items-center gap-3 py-16">
+          <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 px-4 py-16">
             <Spinner />
-            <p className="text-sm text-gray-400">Chargement du menu...</p>
+            <p className="text-sm text-gray-400">جارٍ تحميل القائمة...</p>
           </div>
         ) : error ? (
-          <div className="flex flex-col items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-6 py-12 text-center">
+          <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-6 py-12 text-center">
             <AlertTriangle className="h-7 w-7 text-red-500" />
             <p className="text-sm font-medium text-red-600">{error}</p>
             <Button variant="outline" icon={RefreshCw} onClick={loadData}>
-              Réessayer
+              إعادة المحاولة
             </Button>
           </div>
         ) : products.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-12 text-center text-sm text-gray-500">
-            Aucun produit disponible pour le moment.
+          <div className="mx-auto max-w-6xl rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-12 text-center text-sm text-gray-500">
+            لا توجد أطباق متوفرة حالياً.
           </div>
         ) : (
           <>
-            <div className="flex items-center justify-end rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
-              <label className="flex cursor-pointer items-center gap-2 font-semibold text-gray-700">
-                <input
-                  type="checkbox"
-                  checked={allSelected}
-                  onChange={handleSelectAll}
-                  style={{ accentColor: "#E58730" }}
-                  className="h-5 w-5 cursor-pointer rounded"
+            {/* 3. Packs */}
+
+            <section className="w-full bg-cream py-12">
+              <div className="mx-auto max-w-6xl px-4 sm:px-6">
+                <PackSection
+                  packs={packs}
+                  onAdd={handleAddPack}
+                  onImageClick={(src, alt) => setLightbox({ src, alt })}
                 />
-                <span>Sélectionner tout</span>
-              </label>
-            </div>
+              </div>
+            </section>
 
-            <ProductGrid
-              products={products}
-              items={items}
-              onToggle={handleToggle}
-              onQuantityChange={setQuantity}
-              onNoteChange={setNote}
-              onImageClick={(src, alt) => setLightbox({ src, alt })}
-            />
+            {/* 4. A la carte — back to cream, so the bands alternate */}
 
-            <PackSection
-              packs={packs}
-              onAdd={handleAddPack}
-              onImageClick={(src, alt) => setLightbox({ src, alt })}
-            />
+            <section
+              id="menu"
+              className="w-full scroll-mt-24 bg-cream py-14"
+            >
+              <div className="mx-auto max-w-6xl px-4 sm:px-6">
+                <div className="text-center">
+                  <p
+                    dir="rtl"
+                    className="text-xs font-extrabold uppercase tracking-[0.3em] text-primary"
+                  >
+                    الأسبوع الحالي
+                  </p>
 
-            <div className="space-y-4 rounded-xl border border-gray-100 bg-white p-5 shadow-md">
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between text-gray-600">
-                  <span>Sous-total:</span>
-                  <span className="font-semibold">
-                    {formatCurrency(totals?.subtotal ?? 0)}
-                  </span>
+                  <h2 className="mt-3 font-serif text-4xl font-semibold leading-tight text-forest sm:text-5xl">
+                    قائمة الأسبوع
+                  </h2>
+
+                  <p className="mt-3 text-sm text-gray-600 sm:text-base">
+                    كوّن وجباتك المنزلية، على إيقاعك.
+                  </p>
                 </div>
 
-                {totals && totals.discountAmount > 0 ? (
-                  <div className="flex justify-between font-bold text-leaf">
-                    <span>Remise (packs / promos):</span>
-                    <span>- {formatCurrency(totals.discountAmount)}</span>
-                  </div>
-                ) : null}
+                <div className="mt-12 flex items-center justify-between gap-4">
+                  <h3 className="font-serif text-2xl font-semibold text-forest sm:text-3xl">
+                    اختار أطباقك
+                  </h3>
 
-                <div className="flex justify-between border-t pt-2 text-lg font-black text-forest">
-                  <span>Total:</span>
-                  <span>
-                    {pricingLoading ? "..." : formatCurrency(totals?.totalPrice ?? 0)}
-                  </span>
+                  <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-gray-600">
+                    <input
+                      type="checkbox"
+                      checked={allSelected}
+                      onChange={handleSelectAll}
+                      style={{ accentColor: "#E58730" }}
+                      className="h-5 w-5 cursor-pointer rounded"
+                    />
+                    <span>اختر الكل</span>
+                  </label>
+                </div>
+
+                <div className="mt-6">
+                  <ProductGrid
+                    products={products}
+                    items={items}
+                    onToggle={handleToggle}
+                    onQuantityChange={setQuantity}
+                    onNoteChange={setNote}
+                    onImageClick={(src, alt) => setLightbox({ src, alt })}
+                  />
                 </div>
               </div>
-
-              {stepError ? (
-                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">
-                  {stepError}
-                </div>
-              ) : null}
-
-              <button
-                type="button"
-                onClick={handleNext}
-                className="flex w-full cursor-pointer items-center justify-center rounded-xl bg-leaf py-3.5 text-base font-bold text-white shadow-lg transition duration-200 hover:bg-forest"
-              >
-                Suivant
-              </button>
-            </div>
+            </section>
           </>
         )}
+
+        {/* 5. Order summary — in the flow, right under the dishes */}
+
+        <div className="bg-cream px-4 py-10 sm:px-6">
+          {stepError ? (
+            <p className="mx-auto mb-3 max-w-5xl rounded-xl bg-red-600/90 px-4 py-2.5 text-sm font-semibold text-white">
+              {stepError}
+            </p>
+          ) : null}
+
+          <div className="mx-auto flex max-w-5xl flex-col gap-5 rounded-3xl bg-forest-deep px-6 py-7 shadow-lg ring-1 ring-white/10 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
+            <div className="lg:min-w-0">
+              <p className="text-[11px] font-extrabold uppercase tracking-[0.25em] text-primary">
+                اختياراتك
+              </p>
+
+              <p className="mt-1 font-serif text-xl font-semibold text-white sm:text-2xl">
+                {itemsCount} وجبة مختارة
+              </p>
+
+              <p className="mt-0.5 text-[11px] text-white/50">
+                خصم الباقات والعروض يُطبَّق تلقائياً.
+              </p>
+            </div>
+
+            <div className="lg:text-center">
+              <p className="text-[11px] font-extrabold uppercase tracking-[0.25em] text-primary">
+                المجموع
+              </p>
+
+              <p className="mt-1 font-serif text-2xl font-semibold text-white sm:text-3xl">
+                {pricingLoading && !totals
+                  ? "..."
+                  : formatCurrency(totals?.totalPrice ?? 0)}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleNext}
+              className="flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-primary px-8 py-4 text-base font-extrabold text-white shadow-lg transition duration-200 hover:bg-primary-dark"
+            >
+              متابعة
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* 6. FAQ */}
 
         <Faq />
       </div>
 
-      <Slide />
+      {/* 7. Footer */}
+
+      <SiteFooter />
 
       <ImageLightbox
         src={lightbox?.src}

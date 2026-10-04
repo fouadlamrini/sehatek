@@ -10,7 +10,7 @@ export const QuantityStepper = ({ value, onChange, min = 1, max = 20, disabled }
         type="button"
         onClick={decrease}
         disabled={disabled || value <= min}
-        aria-label="Diminuer la quantité"
+        aria-label="تنقص الكمية"
         className={cn(
           "flex h-8 w-8 items-center justify-center rounded-lg bg-white text-lg font-bold text-gray-700 shadow-sm transition hover:bg-gray-200",
           (disabled || value <= min) && "cursor-not-allowed opacity-40"
@@ -27,7 +27,7 @@ export const QuantityStepper = ({ value, onChange, min = 1, max = 20, disabled }
         type="button"
         onClick={increase}
         disabled={disabled || value >= max}
-        aria-label="Augmenter la quantité"
+        aria-label="زيد الكمية"
         className={cn(
           "flex h-8 w-8 items-center justify-center rounded-lg bg-white text-lg font-bold text-gray-700 shadow-sm transition hover:bg-gray-200",
           (disabled || value >= max) && "cursor-not-allowed opacity-40"

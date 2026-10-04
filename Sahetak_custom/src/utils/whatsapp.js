@@ -18,47 +18,45 @@ export const buildOrderMessage = (items, customer, delivery, order) => {
 
   const lines = [];
 
-  lines.push("Bonjour Sehatek,");
+  lines.push("السلام عليكم Sehatek،");
   lines.push("");
-  lines.push(
-    ref
-      ? `Je souhaite confirmer ma commande ${ref}.`
-      : "Je souhaite confirmer ma commande."
-  );
+  lines.push(ref ? `بغيت نأكد الطلب ${ref}.` : "بغيت نأكد الطلب ديالي.");
   lines.push("");
 
-  lines.push("🍽️ Produits:");
+  lines.push("🍽️ الأطباق:");
   for (const item of items) {
-    const note = item.note ? ` (Note: ${item.note})` : "";
+    const note = item.note ? ` (ملاحظة: ${item.note})` : "";
     lines.push(`- ${item.name} [${item.mealDay}] x${item.quantity}${note}`);
   }
   lines.push("");
 
   if (order?.discount > 0) {
-    lines.push(`🎁 Remise: -${order.discount} DH`);
+    lines.push(`🎁 الخصم: -${order.discount} DH`);
   }
 
   if (order?.totalPrice !== undefined) {
-    lines.push(`💰 Total: ${order.totalPrice} DH`);
+    lines.push(`💰 المجموع: ${order.totalPrice} DH`);
   }
 
   lines.push("");
-  lines.push("👤 Client:");
-  lines.push(`Nom: ${customer.name}`);
-  lines.push(`Téléphone: ${customer.phone}`);
+  lines.push("👤 الزبون:");
+  lines.push(`الاسم: ${customer.name}`);
+  lines.push(`الهاتف: ${customer.phone}`);
 
   lines.push("");
-  lines.push("📍 Livraison:");
-  lines.push(`Type: ${LOCATION_TYPE_LABELS[delivery.locationType] ?? delivery.locationType}`);
-  lines.push(`Ville: ${delivery.city}`);
-  lines.push(`Quartier: ${delivery.quartier}`);
+  lines.push("📍 التوصيل:");
+  lines.push(
+    `النوع: ${LOCATION_TYPE_LABELS[delivery.locationType] ?? delivery.locationType}`
+  );
+  lines.push(`المدينة: ${delivery.city}`);
+  lines.push(`الحي: ${delivery.quartier}`);
 
   if (delivery.receiverName) {
-    lines.push(`Reçu par: ${delivery.receiverName}`);
+    lines.push(`يستلمها: ${delivery.receiverName}`);
   }
 
   lines.push("");
-  lines.push("Merci.");
+  lines.push("شكراً.");
 
   return lines.join("\n");
 };

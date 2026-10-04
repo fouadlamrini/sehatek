@@ -1,290 +1,92 @@
-import { useState } from 'react';
-import Sahetak from '../assets/sahetak.png';
-import Plats from '../assets/plats.jpeg';
-import { useSiteSettings } from '../hooks/useSiteSettings';
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
+
+import BrandLogo from "./ui/BrandLogo";
+import ImageLightbox from "./ui/ImageLightbox";
+import Plats from "../assets/plats.jpeg";
+import { useSiteSettings } from "../hooks/useSiteSettings";
 
 const Header = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [lightbox, setLightbox] = useState(null);
   const { settings, loading } = useSiteSettings();
 
   // Admin-managed images fall back to the packaged defaults, only after the
   // fetch settles — never while loading.
   const bannerImage = settings?.bannerImage?.url || Plats;
-  const profileImage = settings?.profileImage?.url || Sahetak;
+  const profileImage = settings?.profileImage?.url || null;
 
   return (
-    <>
-      {/* ========================= */}
-      {/* HEADER */}
-      {/* ========================= */}
+    // Hero sits on the same dark green as the navbar, so the two read as one
+    // block: photo on top, brand block underneath.
+    <header className="w-full bg-forest">
+      {/* Photo banner — always the full screen width */}
 
-      <header className="w-full bg-white shadow-md rounded-b-lg overflow-hidden">
-
-        {/* ========================= */}
-        {/* PHOTO BANNER */}
-        {/* ========================= */}
-
-        {loading ? (
-          <div className="relative h-48 sm:h-56 md:h-64 w-full animate-pulse bg-gray-200" />
-        ) : (
-          <div
-            onClick={() => setIsOpen(true)}
-            className="
-              relative
-              h-48
-              sm:h-56
-              md:h-64
-              w-full
-              bg-gray-200
-              cursor-pointer
-              group
-              overflow-hidden
-            "
-          >
-            <img
-              src={bannerImage}
-              alt="Banner"
-              className="
-                w-full
-                h-full
-                object-cover
-                transition-transform
-                duration-300
-                group-hover:scale-105
-              "
-            />
-
-            {/* Hover Overlay */}
-
-            <div
-              className="
-                absolute
-                inset-0
-                bg-black/20
-                opacity-0
-                group-hover:opacity-100
-                transition-opacity
-                duration-300
-                flex
-                items-center
-                justify-center
-              "
-            >
-              <span
-                className="
-                  text-white
-                  text-sm
-                  font-medium
-                  bg-black/50
-                  px-3
-                  py-1
-                  rounded-full
-                  backdrop-blur-sm
-                "
-              >
-                Afficher la photo
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* ========================= */}
-        {/* PROFILE */}
-        {/* ========================= */}
-
-        <div className="relative px-4 sm:px-8 pb-4">
-
-          <div
-            className="
-              flex
-              flex-col
-              items-center
-              -mt-16
-              sm:-mt-20
-            "
-          >
-
-            {/* ========================= */}
-            {/* PROFILE IMAGE */}
-            {/* ========================= */}
-
-            {loading ? (
-              <div
-                className="
-                  w-32
-                  h-32
-                  sm:w-36
-                  sm:h-36
-                  -mt-16
-                  sm:-mt-20
-                  rounded-full
-                  border-4
-                  border-white
-                  shadow-lg
-                  bg-gray-200
-                  animate-pulse
-                  flex-shrink-0
-                "
-              />
-            ) : (
-              <div
-                className="
-                  relative
-                  w-32
-                  h-32
-                  sm:w-36
-                  sm:h-36
-                  rounded-full
-                  border-4
-                  border-white
-                  shadow-lg
-                  overflow-hidden
-                  bg-gray-100
-                  flex-shrink-0
-                "
-              >
-                <img
-                  src={profileImage}
-                  alt="Profile"
-                  className="
-                    w-full
-                    h-full
-                    object-cover
-                  "
-                />
-              </div>
-            )}
-
-            {/* ========================= */}
-            {/* NAME */}
-            {/* ========================= */}
-
-            <div className="mt-3">
-              <h1
-                className="
-                  text-xl
-                  sm:text-2xl
-                  font-bold
-                  text-gray-900
-                  text-center
-                "
-              >
-                Sahetak
-              </h1>
-            </div>
-
-          </div>
-        </div>
-
-      </header>
-
-      {/* ========================= */}
-      {/* IMAGE MODAL */}
-      {/* ========================= */}
-
-      {isOpen && (
-        <div
-          className="
-            fixed
-            inset-0
-            z-50
-            flex
-            items-center
-            justify-center
-            bg-black/80
-            backdrop-blur-sm
-            p-4
-          "
-          onClick={() => setIsOpen(false)}
+      {loading ? (
+        <div className="h-52 w-full animate-pulse bg-forest-deep sm:h-72 md:h-[26rem]" />
+      ) : (
+        <button
+          type="button"
+          onClick={() => setLightbox({ src: bannerImage, alt: "أطباق الأسبوع" })}
+          className="group relative block h-52 w-full cursor-pointer overflow-hidden bg-forest-deep sm:h-72 md:h-[26rem]"
         >
+          <img
+            src={bannerImage}
+            alt="أطباق الأسبوع"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
 
-          {/* Image Container */}
-
-          <div
-            className="
-              relative
-              max-w-5xl
-              w-full
-              max-h-[90vh]
-              flex
-              items-center
-              justify-center
-            "
-            onClick={(e) => e.stopPropagation()}
-          >
-
-            {/* ========================= */}
-            {/* CLOSE BUTTON */}
-            {/* ========================= */}
-
-            <button
-              onClick={() => setIsOpen(false)}
-              className="
-                absolute
-                -top-12
-                right-0
-                sm:-top-14
-                sm:-right-4
-                bg-white/20
-                hover:bg-white/40
-                text-white
-                hover:text-red-400
-                p-2
-                sm:p-3
-                rounded-full
-                transition-all
-                duration-300
-                transform
-                hover:rotate-90
-                hover:scale-110
-                backdrop-blur-md
-                shadow-lg
-                focus:outline-none
-                cursor-pointer
-              "
-              title="Fermer"
-              aria-label="Fermer"
-            >
-              <svg
-                className="
-                  w-6
-                  h-6
-                  sm:w-7
-                  sm:h-7
-                "
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2.5"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-
-            {/* ========================= */}
-            {/* FULL IMAGE */}
-            {/* ========================= */}
-
-            <img
-              src={bannerImage}
-              alt="Banner Full"
-              className="
-                w-full
-                max-h-[85vh]
-                object-contain
-                rounded-lg
-                shadow-2xl
-              "
-            />
-
-          </div>
-        </div>
+          <span className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <span className="rounded-full bg-black/50 px-3 py-1 text-sm font-medium text-white backdrop-blur-sm">
+              شوف الصورة
+            </span>
+          </span>
+        </button>
       )}
-    </>
+
+      {/* Brand block — the profile photo overlaps the banner */}
+
+      <div className="mx-auto max-w-4xl px-4">
+        <div className="relative -mt-20 px-6 pb-14 pt-24 text-center sm:-mt-24 sm:px-10 sm:pb-20 sm:pt-28">
+          <BrandLogo
+            src={profileImage}
+            alt="Sehatek"
+            variant="lockup"
+            loading={loading}
+            className="absolute left-1/2 top-0 h-40 w-40 -translate-x-1/2 -translate-y-1/2 border-4 border-forest shadow-2xl sm:h-48 sm:w-48"
+            pulseClassName="h-40 w-40 sm:h-48 sm:w-48"
+          />
+
+          <p className="text-xs font-extrabold uppercase tracking-[0.35em] text-primary">
+            Sehatek
+          </p>
+
+          <h1
+            dir="rtl"
+            className="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl"
+          >
+            صحتك .. أولويتنا
+          </h1>
+
+          <p dir="rtl" className="mt-3 text-sm font-medium text-cream/70 sm:text-base">
+            وجبات صحية بنكهة البيت
+          </p>
+
+          <a
+            href="#menu"
+            className="mt-7 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-extrabold text-white shadow-lg transition hover:bg-primary-dark"
+          >
+            اكتشف القائمة
+            <ChevronDown className="h-4 w-4" />
+          </a>
+        </div>
+      </div>
+
+      <ImageLightbox
+        src={lightbox?.src}
+        alt={lightbox?.alt}
+        onClose={() => setLightbox(null)}
+      />
+    </header>
   );
 };
 
