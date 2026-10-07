@@ -11,6 +11,7 @@ const buildDuplicateMessage = (err) => {
     productKey:
       "A product with the same name, meal days and price already exists",
     combinationKey: "A pack with the same products already exists",
+    cityKey: "This city already exists",
     email: "Email is already in use",
     product: "A conflict exists for this product",
   };

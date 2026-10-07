@@ -7,24 +7,46 @@ import CartDrawer from "../CartDrawer";
 import { useSiteSettings } from "../../hooks/useSiteSettings";
 import { cn } from "../../utils/cn";
 
-// RTL nav, ordered right-to-left like the design.
-// "/" and "/track" already exist. "/about" and "/contact" are reserved for the
-// pages still to be added — update the paths here when they land.
+// "/" and "/track" already exist. "/about" is reserved for the page still to be
+// added — update the path here when it lands.
 const NAV_LINKS = [
   { label: "الرئيسية", to: "/" },
-  { label: "الفائمة", to: "/#menu", anchor: "menu" },
   { label: "من نحن", to: "/about" },
   { label: "تابع طلبك", to: "/track" },
-  { label: "اتصل بنا", to: "/contact" },
 ];
+
+// Anchors to sections of the home page rather than to routes.
+const SECTION_LINKS = [
+  { label: "طلبات زبنائنا", anchor: "clients" },
+];
+
+// Badge hanging from the very top of the page. `rounded-b-[999px]` is clamped
+// by the browser to half the width, which gives the fully bowed bottom edge of
+// the reference without hardcoding an elliptical radius per breakpoint.
+const LOGO_SIZES = "h-20 w-24 sm:h-24 sm:w-28";
+const LOGO_ROUNDED = "rounded-b-[999px]";
 
 const SiteHeader = ({ itemsCount = 0 }) => {
   const { settings, loading } = useSiteSettings();
   const location = useLocation();
+
   const [cartOpen, setCartOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   const profileImage = settings?.profileImage?.url || null;
+
+  // The badge belongs to the hero composition (flush with the top of the page,
+  // dropping over the photo). Once the bar sticks, that composition is gone, so
+  // the badge slides away instead of hanging over the content underneath.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     if (!location.hash) {
@@ -40,8 +62,7 @@ const SiteHeader = ({ itemsCount = 0 }) => {
     setMenuOpen(false);
   }, [location.pathname, location.hash]);
 
-  // Already on the home page: skip the navigation and scroll in place so
-  // repeated clicks keep working.
+  // Only meaningful on the home page; elsewhere the route change does the work.
   const handleAnchorClick = (event, anchor) => {
     if (location.pathname !== "/") {
       return;
@@ -61,7 +82,6 @@ const SiteHeader = ({ itemsCount = 0 }) => {
       <Link
         key={link.to}
         to={link.to}
-        onClick={link.anchor ? (event) => handleAnchorClick(event, link.anchor) : undefined}
         aria-current={active ? "page" : undefined}
         className={cn(
           "relative rounded-lg px-1 py-2 text-[15px] font-bold transition-colors",
@@ -77,83 +97,110 @@ const SiteHeader = ({ itemsCount = 0 }) => {
     );
   };
 
+  const renderSectionLink = (link) => (
+    <a
+      key={link.anchor}
+      href={`/#${link.anchor}`}
+      onClick={(event) => handleAnchorClick(event, link.anchor)}
+      className="rounded-lg px-1 py-2 text-[15px] font-bold text-white/80 transition-colors hover:text-white"
+    >
+      {link.label}
+    </a>
+  );
+
+  const cartButton = (className) => (
+    <button
+      type="button"
+      onClick={() => {
+        setCartOpen(true);
+        setMenuOpen(false);
+      }}
+      className={cn(
+        "flex cursor-pointer items-center gap-1.5 rounded-lg px-1 py-2 text-[15px] font-bold text-white/80 transition-colors hover:text-white",
+        className
+      )}
+    >
+      <ShoppingCart className="h-[18px] w-[18px]" />
+      <span>سلة التسوق</span>
+
+      {itemsCount > 0 ? (
+        <span className="rounded-full bg-primary px-1.5 py-0.5 text-[11px] font-extrabold leading-none text-white">
+          {itemsCount}
+        </span>
+      ) : null}
+    </button>
+  );
+
   return (
     <>
-      <header dir="rtl" className="sticky top-0 z-30 bg-forest-deep shadow-md">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-2">
-          <Link
-            to="/"
-            aria-label="Sehatek — الصفحة الرئيسية"
-            className="flex shrink-0 items-center rounded-full ring-2 ring-white/15 transition hover:ring-primary/60"
-          >
-            <BrandLogo
-              src={profileImage}
-              alt="Sehatek"
-              variant="mark"
-              loading={loading}
-              className="h-11 w-11 sm:h-12 sm:w-12"
-              pulseClassName="h-11 w-11 sm:h-12 sm:w-12"
-            />
-          </Link>
+      {/* The badge hangs from the very top of the page and drops over the hero
+          photo, so it lives here rather than in the hero. z-10 keeps it above
+          the bar background; the bar's own z-30 keeps it above the page. */}
+      <header dir="rtl" className="sticky top-0 z-30 bg-forest-deep">
+        <BrandLogo
+          src={profileImage}
+          alt="Sehatek"
+          variant="lockup"
+          rounded={LOGO_ROUNDED}
+          loading={loading}
+          className={cn(
+            `absolute left-1/2 top-0 z-10 -translate-x-1/2 shadow-xl transition-all duration-300 ${LOGO_SIZES}`,
+            scrolled && "pointer-events-none -translate-y-full opacity-0"
+          )}
+          pulseClassName={LOGO_SIZES}
+        />
 
-          <nav className="hidden items-center gap-5 md:flex" aria-label="Navigation principale">
-            {NAV_LINKS.filter((link) => !link.anchor).map(renderLink)}
-
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          {/* Mobile */}
+          <div className="flex items-center justify-end py-3 md:hidden">
             <button
               type="button"
-              onClick={() => setCartOpen(true)}
-              className="flex cursor-pointer items-center gap-1.5 rounded-lg px-1 py-2 text-[15px] font-bold text-white/80 transition-colors hover:text-white"
+              onClick={() => setMenuOpen((open) => !open)}
+              aria-expanded={menuOpen}
+              aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg text-white transition hover:bg-white/10"
             >
-              <ShoppingCart className="h-[18px] w-[18px]" />
-              <span>سلة التسوق</span>
-
-              {itemsCount > 0 ? (
-                <span className="rounded-full bg-primary px-1.5 py-0.5 text-[11px] font-extrabold leading-none text-white">
-                  {itemsCount}
-                </span>
-              ) : null}
+              {menuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </button>
-          </nav>
+          </div>
 
-          <button
-            type="button"
-            onClick={() => setMenuOpen((open) => !open)}
-            aria-expanded={menuOpen}
-            aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg text-white transition hover:bg-white/10 md:hidden"
-          >
-            {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+          {/* Desktop: section link on the right, main nav on the left, and a
+              reserved centre slot so the hanging badge never overlaps a link. */}
+          <div className="hidden grid-cols-[1fr_8rem_1fr] items-center py-3 md:grid">
+            <nav
+              aria-label="Sections"
+              className="col-start-1 flex items-center justify-end gap-6"
+            >
+              {SECTION_LINKS.map(renderSectionLink)}
+            </nav>
+
+            <nav
+              aria-label="Navigation principale"
+              className="col-start-3 flex items-center gap-6"
+            >
+              {NAV_LINKS.map(renderLink)}
+              {cartButton()}
+            </nav>
+          </div>
         </div>
 
         {menuOpen ? (
           <nav
             aria-label="Navigation principale"
-            className="border-t border-white/10 bg-forest-deep px-4 pb-4 pt-2 md:hidden"
+            className="border-t border-white/10 px-4 pb-4 pt-2 md:hidden"
           >
             <ul className="flex flex-col">
               {NAV_LINKS.map(renderLink)}
             </ul>
 
-            <li className="mt-1">
-              <button
-                type="button"
-                onClick={() => {
-                  setCartOpen(true);
-                  setMenuOpen(false);
-                }}
-                className="flex w-full cursor-pointer items-center gap-2 rounded-lg px-1 py-2 text-[15px] font-bold text-white/80 transition-colors hover:text-white"
-              >
-                <ShoppingCart className="h-[18px] w-[18px]" />
-                <span>سلة التسوق</span>
-
-                {itemsCount > 0 ? (
-                  <span className="rounded-full bg-primary px-1.5 py-0.5 text-[11px] font-extrabold leading-none text-white">
-                    {itemsCount}
-                  </span>
-                ) : null}
-              </button>
-            </li>
+            <div className="mt-1 flex flex-col">
+              {SECTION_LINKS.map(renderSectionLink)}
+              {cartButton("w-full")}
+            </div>
           </nav>
         ) : null}
       </header>

@@ -9,6 +9,7 @@ import Dashboard from "../pages/dashboard/Dashboard";
 import Products from "../pages/products/Products";
 import Promotions from "../pages/promotions/Promotions";
 import Packs from "../pages/packs/Packs";
+import Cities from "../pages/cities/Cities";
 import Orders from "../pages/orders/Orders";
 import Admins from "../pages/admins/Admins";
 import CreateAdmin from "../pages/admins/CreateAdmin";
@@ -29,6 +30,7 @@ const AppRoutes = () => (
         <Route path="/promotions" element={<Promotions />} />
         <Route path="/packs" element={<Packs />} />
         <Route path="/orders" element={<Orders />} />
+        <Route path="/cities" element={<Cities />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
 

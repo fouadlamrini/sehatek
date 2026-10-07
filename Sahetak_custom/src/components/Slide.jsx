@@ -87,7 +87,7 @@ function Slide() {
   };
 
   return (
-    <section className="w-full overflow-hidden bg-cream py-12 sm:py-16">
+    <section id="clients" className="w-full scroll-mt-24 overflow-hidden bg-cream py-12 sm:py-16">
       <div className="mb-10 flex justify-center px-4">
         <h2 dir="rtl" className="text-center font-serif text-3xl font-medium text-forest sm:text-4xl">
           طلبات زبنائنا

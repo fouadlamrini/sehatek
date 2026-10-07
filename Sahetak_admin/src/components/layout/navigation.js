@@ -2,6 +2,7 @@ import {
   ClipboardList,
   Image as ImageIcon,
   LayoutDashboard,
+  MapPin,
   Package,
   Percent,
   UserCircle,
@@ -35,6 +36,12 @@ export const NAV_ITEMS = [
     label: "Orders",
     to: "/orders",
     icon: ClipboardList,
+  },
+  {
+    type: "link",
+    label: "Delivery cities",
+    to: "/cities",
+    icon: MapPin,
   },
   {
     type: "group",

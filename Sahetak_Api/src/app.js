@@ -12,6 +12,7 @@ const orderRoutes = require("./routes/orderRoutes");
 const statisticsRoutes = require("./routes/statisticsRoutes");
 const pricingRoutes = require("./routes/pricingRoutes");
 const settingsRoutes = require("./routes/settingsRoutes");
+const cityRoutes = require("./routes/cityRoutes");
 
 const { apiLimiter } = require("./middleware/rateLimitMiddleware");
 const requestLogger = require("./middleware/requestLogger");
@@ -82,6 +83,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/statistics", statisticsRoutes);
 app.use("/api/pricing", pricingRoutes);
 app.use("/api/settings", settingsRoutes);
+app.use("/api/cities", cityRoutes);
 
 // =========================
 // 404 - ROUTE NOT FOUND

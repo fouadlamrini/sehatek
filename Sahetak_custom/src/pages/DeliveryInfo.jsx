@@ -5,8 +5,10 @@ import { ArrowLeft, MapPin } from "lucide-react";
 import StepLayout from "../components/layout/StepLayout";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
+import Select from "../components/ui/Select";
 
 import { useOrder } from "../context/OrderContext";
+import { useCities } from "../hooks/useCities";
 import { LOCATION_TYPES, STEPS } from "../constants";
 import { validateDelivery } from "../utils/validation";
 import { cn } from "../utils/cn";
@@ -14,6 +16,7 @@ import { cn } from "../utils/cn";
 const DeliveryInfo = () => {
   const navigate = useNavigate();
   const { items, customer, delivery, setDelivery } = useOrder();
+  const { cities, loading: citiesLoading } = useCities();
 
   const [form, setForm] = useState(delivery);
   const [errors, setErrors] = useState({});
@@ -70,15 +73,31 @@ const DeliveryInfo = () => {
         </div>
 
         <div className="space-y-4">
-          <Input
+          <Select
             label="المدينة"
             name="city"
             value={form.city}
             onChange={handleChange}
             error={errors.city}
-            placeholder="مثال: الدار البيضاء"
-            autoComplete="address-level2"
-          />
+            disabled={citiesLoading || cities.length === 0}
+            placeholder={
+              citiesLoading
+                ? "جارٍ تحميل المدن..."
+                : "ما كايناش مدن متوفرة حالياً"
+            }
+          >
+            {cities.map((city) => (
+              <option key={city._id} value={city.name}>
+                {city.name}
+              </option>
+            ))}
+          </Select>
+
+          {!citiesLoading && cities.length === 0 ? (
+            <p className="-mt-2 text-xs text-gray-400">
+              ما كاين حتى مدينة متوفرة دابا. تواصل معانا باش نزيدوها.
+            </p>
+          ) : null}
 
           <Input
             label="الحي"
