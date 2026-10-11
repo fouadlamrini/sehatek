@@ -37,6 +37,34 @@ import { formatCurrency } from "../utils/formatters";
 import { buildProductDayCards } from "../utils/catalog";
 
 // -----------------------------------------------------------------------------
+// ترتيب أيام الأسبوع
+// -----------------------------------------------------------------------------
+const DAYS_ORDER = {
+  "الاثنين": 1,
+  "الإثنين": 1,
+  lundi: 1,
+  "الثلاثاء": 2,
+  mardi: 2,
+  "الاربعاء": 3,
+  "الأربعاء": 3,
+  mercredi: 3,
+  "الخميس": 4,
+  jeudi: 4,
+  "الجمعة": 5,
+  vendredi: 5,
+  "السبت": 6,
+  samedi: 6,
+  "الاحد": 7,
+  "الأحد": 7,
+  dimanche: 7,
+};
+
+const getDayOrder = (day) => {
+  const normalizedDay = String(day ?? "").trim().toLowerCase();
+  return DAYS_ORDER[normalizedDay] ?? 99;
+};
+
+// -----------------------------------------------------------------------------
 // New section: "لماذا تختارنا؟" — value props with soft icon tiles
 // -----------------------------------------------------------------------------
 const WHY_US = [
@@ -131,7 +159,7 @@ const HowItWorks = () => (
     <div className="mx-auto max-w-6xl px-4 sm:px-6">
       <div className="text-center">
         <p dir="rtl" className="text-xs font-extrabold uppercase tracking-[0.3em] text-primary">
-          كيف  نعمل؟
+          كيف نعمل؟
         </p>
         <h2 className="mt-3 font-serif text-3xl font-semibold text-white sm:text-4xl">
           من القائمة لباب دارك ف 4 خطوات
@@ -227,7 +255,7 @@ const Testimonials = () => (
 );
 
 // -----------------------------------------------------------------------------
-// Updated home page: reordered sections + the three new blocks above
+// Updated home page
 // -----------------------------------------------------------------------------
 const Products = () => {
   const navigate = useNavigate();
@@ -251,7 +279,14 @@ const Products = () => {
 
   const { pricing, loading: pricingLoading } = useCartPricing(distinctProductIds);
 
-  const cards = useMemo(() => buildProductDayCards(products), [products]);
+  // التعديل هنا: ترتيب البطاقات مباشرة بعد توليدها باستخدام useMemo
+  const cards = useMemo(() => {
+    const generatedCards = buildProductDayCards(products);
+    
+    return generatedCards.sort((a, b) => {
+      return getDayOrder(a.mealDay) - getDayOrder(b.mealDay);
+    });
+  }, [products]);
 
   const selectedKeys = useMemo(
     () => new Set(items.map((item) => item.key)),
@@ -279,7 +314,14 @@ const Products = () => {
         packApi.getPacks(),
       ]);
 
-      setProducts(productsRes.data);
+      const sortedProducts = [...productsRes.data].sort((a, b) => {
+        return (
+          getDayOrder(a.mealDays?.[0]) -
+          getDayOrder(b.mealDays?.[0])
+        );
+      });
+
+      setProducts(sortedProducts);
       setPacks(packsRes.data);
     } catch (err) {
       setError(
@@ -456,6 +498,7 @@ const Products = () => {
                 </div>
 
                 <div className="mt-6">
+                  {/* الدالة ProductGrid دابا غتستعمل البطاقات اللي تم الترتيب ديالها */}
                   <ProductGrid
                     products={products}
                     items={items}
