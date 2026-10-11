@@ -61,8 +61,6 @@ const TrackOrder = () => {
   const [searchError, setSearchError] = useState("");
 
   const [order, setOrder] = useState(null);
-  // Short-lived capability for update/cancel, kept only in memory (never in
-  // the URL and never persisted) and refreshed after every successful track.
   const [trackToken, setTrackToken] = useState(null);
   const [actionError, setActionError] = useState("");
 
@@ -142,7 +140,6 @@ const TrackOrder = () => {
       const { data, trackToken: nextToken } = await orderApi.updateOrder({
         trackingCode: order.trackingCode,
         trackToken,
-        // Identity: current stored phone (a new phone is provided via newPhone)
         phone: order.customer.phone,
         ...(editForm.customerName.trim()
           ? { customerName: editForm.customerName.trim() }
@@ -209,78 +206,80 @@ const TrackOrder = () => {
         <button
           type="button"
           onClick={() => navigate("/")}
-          className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 transition hover:text-primary"
+          className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-500 shadow-sm transition hover:border-primary hover:text-primary"
         >
           <ArrowLeft className="h-4 w-4" />
           <span dir="rtl">العودة للقائمة</span>
         </button>
 
         {!order ? (
-          <div className="grid items-center gap-8 lg:grid-cols-[auto_minmax(0,1fr)] lg:gap-12">
+          <div className="grid items-center gap-8 lg:grid-cols-[auto_1fr]">
             <img
               src={Livraison}
               alt=""
               aria-hidden="true"
-              className="mx-auto w-52 select-none sm:w-64 lg:mx-0 lg:w-80"
+              className="mx-auto w-52 select-none rounded-3xl shadow-lg shadow-forest/5 ring-1 ring-gray-100 sm:w-64 lg:mx-0 lg:w-80"
             />
 
-            <div className="rounded-3xl border border-forest/10 bg-white p-6 shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
-                <PackageSearch className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <h1 className="text-xl font-extrabold text-forest">
-                  تتبع الطلب ديالي
-                </h1>
-                <p className="text-sm text-gray-500">
-                  أدخل كود التتبع ورقم الهاتف ديالك
-                </p>
-              </div>
-            </div>
-
-            <form
-              className="mt-5 space-y-4"
-              onSubmit={(event) => {
-                event.preventDefault();
-                handleSearch();
-              }}
-            >
-              <Input
-                label="كود التتبع"
-                name="trackingCode"
-                value={form.trackingCode}
-                onChange={handleChange}
-                placeholder="مثال: STK-1A2B3C4D5"
-                autoCapitalize="characters"
-              />
-
-              <Input
-                label="رقم الهاتف"
-                name="phone"
-                type="tel"
-                value={form.phone}
-                onChange={handleChange}
-                placeholder="0612345678"
-                autoComplete="tel"
-              />
-
-              {searchError ? (
-                <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
-                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-                  <span>{searchError}</span>
+            <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-lg shadow-forest/5 sm:p-8">
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
+                  <PackageSearch className="h-6 w-6 text-primary" />
                 </div>
-              ) : null}
+                <div>
+                  <h1 className="text-xl font-extrabold text-forest">
+                    تتبع الطلب ديالي
+                  </h1>
+                  <p className="text-sm text-gray-500">
+                    أدخل كود التتبع ورقم الهاتف ديالك
+                  </p>
+                </div>
+              </div>
 
-              <Button
-                type="submit"
-                loading={searching}
-                icon={PackageSearch}
-                className="w-full"
+              <form
+                className="mt-6 space-y-5"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  handleSearch();
+                }}
               >
-                البحث عن الطلب
-              </Button>
-            </form>
+                <Input
+                  label="كود التتبع"
+                  name="trackingCode"
+                  value={form.trackingCode}
+                  onChange={handleChange}
+                  autoCapitalize="characters"
+                />
+
+                <Input
+                  label="رقم الهاتف"
+                  name="phone"
+                  type="tel"
+                  value={form.phone}
+                  onChange={handleChange}
+                  autoComplete="tel"
+                />
+
+                {searchError ? (
+                  <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>{searchError}</span>
+                  </div>
+                ) : null}
+
+                <button
+                  type="submit"
+                  disabled={searching}
+                  className="flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-primary text-base font-bold text-white shadow-lg shadow-primary/30 transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {searching ? (
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                  ) : (
+                    <PackageSearch className="h-5 w-5" />
+                  )}
+                  البحث عن الطلب
+                </button>
+              </form>
             </div>
           </div>
         ) : searching ? (
@@ -289,14 +288,13 @@ const TrackOrder = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            {/* Status card */}
-            <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+            <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
                     الطلب
                   </p>
-                  <p className="text-lg font-extrabold text-primary">
+                  <p dir="ltr" className="text-lg font-extrabold text-primary">
                     {order.trackingCode}
                   </p>
                 </div>
@@ -314,26 +312,32 @@ const TrackOrder = () => {
                   </span>
                 </div>
               ) : (
-                <ol className="mt-6 flex items-start">
+                <ol className="mt-8 flex items-start">
                   {TRACK_STEPS.map((step, index) => {
                     const done = index <= statusIndex;
+                    const active = index === statusIndex;
 
                     return (
                       <li key={step.key} className="flex flex-1 items-start last:flex-none">
                         <div className="flex flex-col items-center">
-                          <span
-                            className={cn(
-                              "flex h-7 w-7 items-center justify-center rounded-full border-2 text-xs font-bold transition",
-                              done
-                                ? "border-primary bg-primary text-white"
-                                : "border-gray-300 bg-white text-gray-400"
-                            )}
-                          >
-                            {done ? <Check className="h-3.5 w-3.5" /> : index + 1}
+                          <span className="relative flex">
+                            {active ? (
+                              <span className="absolute inset-0 animate-ping rounded-full bg-primary/30" />
+                            ) : null}
+                            <span
+                              className={cn(
+                                "relative flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold transition-all",
+                                done
+                                  ? "bg-primary text-white ring-4 ring-primary/20"
+                                  : "border-2 border-gray-200 bg-white text-gray-400"
+                              )}
+                            >
+                              {done ? <Check className="h-4 w-4" /> : index + 1}
+                            </span>
                           </span>
                           <span
                             className={cn(
-                              "mt-1.5 whitespace-nowrap text-[10px] font-semibold",
+                              "mt-2 whitespace-nowrap text-xs font-semibold",
                               done ? "text-primary" : "text-gray-400"
                             )}
                           >
@@ -344,7 +348,7 @@ const TrackOrder = () => {
                         {index < TRACK_STEPS.length - 1 ? (
                           <span
                             className={cn(
-                              "mt-3.5 mx-1 h-0.5 flex-1 rounded",
+                              "mx-1 mt-5 h-1 flex-1 rounded-full",
                               index < statusIndex ? "bg-primary" : "bg-gray-200"
                             )}
                           />
@@ -355,7 +359,7 @@ const TrackOrder = () => {
                 </ol>
               )}
 
-              <p className="mt-4 text-center text-xs text-gray-400">
+              <p className="mt-5 text-center text-xs text-gray-400">
                 تم الطلب في{" "}
                 {new Date(order.createdAt).toLocaleDateString("ar-MA", {
                   day: "numeric",
@@ -366,8 +370,7 @@ const TrackOrder = () => {
               </p>
             </div>
 
-            {/* Items */}
-            <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-3xl border border-gray-100 bg-white p-5 shadow-sm">
               <h2 className="text-sm font-bold text-forest">طلبك</h2>
 
               <ul className="mt-2 divide-y divide-gray-100">
@@ -381,7 +384,7 @@ const TrackOrder = () => {
                         <img
                           src={product.image}
                           alt={product.name}
-                          className="h-14 w-14 shrink-0 rounded-xl object-cover"
+                          className="h-16 w-16 shrink-0 rounded-2xl object-cover ring-1 ring-gray-100"
                         />
                       ) : null}
 
@@ -423,22 +426,23 @@ const TrackOrder = () => {
               </div>
             </div>
 
-            {/* Delivery / customer */}
-            <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-3xl border border-gray-100 bg-white p-5 shadow-sm">
               <h2 className="text-sm font-bold text-forest">التوصيل</h2>
 
-              <div className="mt-3 flex items-start gap-2 text-sm text-gray-600">
-                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <div>
-                  <p className="font-semibold text-gray-800">
-                    {LOCATION_TYPE_LABELS[order.delivery?.locationType] ?? order.delivery?.locationType}
-                  </p>
-                  <p>
-                    {order.delivery?.quartier}, {order.delivery?.city}
-                  </p>
-                  {order.delivery?.receiverName ? (
-                    <p className="text-gray-400">يستلمها: {order.delivery.receiverName}</p>
-                  ) : null}
+              <div className="mt-3 rounded-2xl bg-cream p-4">
+                <div className="flex items-start gap-2 text-sm text-gray-600">
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <div>
+                    <p className="font-semibold text-gray-800">
+                      {LOCATION_TYPE_LABELS[order.delivery?.locationType] ?? order.delivery?.locationType}
+                    </p>
+                    <p>
+                      {order.delivery?.quartier}, {order.delivery?.city}
+                    </p>
+                    {order.delivery?.receiverName ? (
+                      <p className="text-gray-400">يستلمها: {order.delivery.receiverName}</p>
+                    ) : null}
+                  </div>
                 </div>
               </div>
 
@@ -464,7 +468,7 @@ const TrackOrder = () => {
             {order.status === "pending" ? (
               <>
                 {editing ? (
-                  <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
+                  <div className="rounded-3xl border border-gray-100 bg-white p-5 shadow-sm">
                     <h2 className="text-sm font-bold text-forest">
                       تعديل الطلب ديالي
                     </h2>
@@ -483,7 +487,7 @@ const TrackOrder = () => {
                         type="tel"
                         value={editForm.newPhone}
                         onChange={handleEditChange}
-                        placeholder="0699998877"
+                        hint="0699998877"
                       />
 
                       <Input
@@ -529,7 +533,7 @@ const TrackOrder = () => {
                         name="receiverName"
                         value={editForm.receiverName}
                         onChange={handleEditChange}
-                        placeholder="(اختياري)"
+                        hint="اختياري"
                       />
                     </div>
 

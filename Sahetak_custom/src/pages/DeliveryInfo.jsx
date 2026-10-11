@@ -63,11 +63,13 @@ const DeliveryInfo = () => {
     >
       <form
         onSubmit={handleSubmit}
-        className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+        className="rounded-3xl border border-gray-200 bg-white p-6 shadow-xl shadow-gray-200/50 sm:p-8"
       >
-        <div className="mb-4 flex items-center gap-2 text-primary">
-          <MapPin className="h-5 w-5" />
-          <span dir="rtl" className="text-sm font-bold">
+        <div className="mb-6 flex items-center gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <MapPin className="h-5 w-5" />
+          </span>
+          <span dir="rtl" className="text-base font-bold text-ink">
             عنوان التوصيل
           </span>
         </div>
@@ -133,7 +135,7 @@ const DeliveryInfo = () => {
                       }));
                     }}
                     className={cn(
-                      "flex items-center gap-2 rounded-xl border px-3 py-3 text-sm font-semibold transition",
+                      "flex items-center gap-2 rounded-2xl border px-3 py-3 text-sm font-semibold transition",
                       selected
                         ? "border-primary bg-primary-soft text-primary"
                         : "border-gray-200 bg-white text-gray-600 hover:border-primary/50"
@@ -163,7 +165,11 @@ const DeliveryInfo = () => {
           />
         </div>
 
-        <Button type="submit" icon={ArrowLeft} className="mt-6 w-full">
+        <Button
+          type="submit"
+          icon={ArrowLeft}
+          className="mt-8 h-13 w-full rounded-2xl bg-primary text-base shadow-lg shadow-primary/30"
+        >
           متابعة
         </Button>
       </form>

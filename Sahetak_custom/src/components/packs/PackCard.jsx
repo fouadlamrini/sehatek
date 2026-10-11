@@ -13,7 +13,6 @@ const PackCard = ({ pack, onAdd, onImageClick }) => {
   const { originalTotal, finalPrice, discount } = computePackPrice(pack);
   const image = products[0]?.image;
 
-  // A pack is unavailable as soon as one of its products is out of stock.
   const unavailable = products.some(
     (product) => Number(product.stock) <= 0
   );
@@ -21,43 +20,43 @@ const PackCard = ({ pack, onAdd, onImageClick }) => {
   return (
     <article
       className={cn(
-        "flex flex-col overflow-hidden rounded-2xl border bg-white shadow-sm",
-        unavailable ? "border-gray-200 opacity-60" : "border-leaf/30"
+        "group flex flex-col overflow-hidden rounded-3xl border bg-white shadow-[0_4px_20px_rgba(32,65,21,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(32,65,21,0.12)]",
+        unavailable ? "border-gray-200 opacity-60" : "border-leaf/20"
       )}
     >
-      <div className="relative">
+      <div className="relative overflow-hidden">
         <button
           type="button"
           onClick={() => image && onImageClick?.(image, pack.name)}
-          className="block h-36 w-full overflow-hidden bg-gray-100"
+          className="block h-40 w-full overflow-hidden bg-gray-100"
         >
           {image ? (
             <img
               src={image}
               alt={pack.name}
               loading="lazy"
-              className="h-full w-full object-cover"
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
             />
           ) : null}
         </button>
 
-        <span className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-leaf px-2.5 py-1 text-xs font-extrabold text-white shadow-md">
+        <span className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-leaf px-2.5 py-1 text-xs font-extrabold text-white shadow-md">
           <Gift className="h-3.5 w-3.5" />
           باقة
         </span>
 
         {unavailable ? (
-          <span className="absolute right-2 top-2 rounded-full bg-red-600 px-2.5 py-1 text-xs font-extrabold text-white shadow-md">
+          <span className="absolute right-3 top-3 rounded-full bg-red-600 px-2.5 py-1 text-xs font-extrabold text-white shadow-md">
             غير متوفرة
           </span>
         ) : discount > 0 ? (
-          <span className="absolute right-2 top-2 rounded-full bg-primary px-2.5 py-1 text-xs font-extrabold text-white shadow-md">
+          <span className="absolute right-3 top-3 rounded-full bg-primary px-2.5 py-1 text-xs font-extrabold text-white shadow-md">
             -{formatCurrency(discount)}
           </span>
         ) : null}
       </div>
 
-      <div className="flex flex-1 flex-col p-4">
+      <div className="flex flex-1 flex-col p-5">
         <h3 className="font-bold text-gray-800">{pack.name}</h3>
 
         <div className="mt-3 flex items-baseline gap-2">
@@ -74,13 +73,13 @@ const PackCard = ({ pack, onAdd, onImageClick }) => {
         <button
           type="button"
           onClick={() => setIsOpen((value) => !value)}
-          className="mt-3 flex cursor-pointer items-center gap-1 text-xs font-bold text-primary hover:underline"
+          className="mt-3 flex cursor-pointer items-center gap-1 text-xs font-bold text-primary transition-colors hover:text-primary-dark"
         >
           {isOpen
             ? "إخفاء الأطباق"
             : `شوف الأطباق (${products.length})`}
           <ChevronDown
-            className={cn("h-3.5 w-3.5 transition-transform", isOpen && "rotate-180")}
+            className={cn("h-3.5 w-3.5 transition-transform duration-200", isOpen && "rotate-180")}
           />
         </button>
 

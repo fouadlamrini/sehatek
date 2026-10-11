@@ -9,15 +9,17 @@ import { cn } from "../../utils/cn";
 
 // "/" and "/track" already exist. "/about" is reserved for the page still to be
 // added — update the path here when it lands.
-const NAV_LINKS = [
+const RIGHT_LINKS = [
   { label: "الرئيسية", to: "/" },
   { label: "من نحن", to: "/about" },
-  { label: "تابع طلبك", to: "/track" },
 ];
 
-// Anchors to sections of the home page rather than to routes.
 const SECTION_LINKS = [
   { label: "طلبات زبنائنا", anchor: "clients" },
+];
+
+const LEFT_LINKS = [
+  { label: "تابع طلبك", to: "/track" },
 ];
 
 // Badge hanging from the very top of the page. `rounded-b-[999px]` is clamped
@@ -168,21 +170,23 @@ const SiteHeader = ({ itemsCount = 0 }) => {
             </button>
           </div>
 
-          {/* Desktop: section link on the right, main nav on the left, and a
-              reserved centre slot so the hanging badge never overlaps a link. */}
+          {/* Desktop: right side (الرئيسية، من نحن، طلبات زبنائنا), center logo,
+              left side (تابع طلبك، سلة التسوق). Reserved centre slot so the
+              hanging badge never overlaps a link. */}
           <div className="hidden grid-cols-[1fr_8rem_1fr] items-center py-3 md:grid">
             <nav
-              aria-label="Sections"
+              aria-label="Navigation principale"
               className="col-start-1 flex items-center justify-end gap-6"
             >
+              {RIGHT_LINKS.map(renderLink)}
               {SECTION_LINKS.map(renderSectionLink)}
             </nav>
 
             <nav
-              aria-label="Navigation principale"
+              aria-label="Navigation secondaire"
               className="col-start-3 flex items-center gap-6"
             >
-              {NAV_LINKS.map(renderLink)}
+              {LEFT_LINKS.map(renderLink)}
               {cartButton()}
             </nav>
           </div>
@@ -194,11 +198,15 @@ const SiteHeader = ({ itemsCount = 0 }) => {
             className="border-t border-white/10 px-4 pb-4 pt-2 md:hidden"
           >
             <ul className="flex flex-col">
-              {NAV_LINKS.map(renderLink)}
+              {RIGHT_LINKS.map(renderLink)}
             </ul>
 
             <div className="mt-1 flex flex-col">
               {SECTION_LINKS.map(renderSectionLink)}
+            </div>
+
+            <div className="mt-1 flex flex-col">
+              {LEFT_LINKS.map(renderLink)}
               {cartButton("w-full")}
             </div>
           </nav>

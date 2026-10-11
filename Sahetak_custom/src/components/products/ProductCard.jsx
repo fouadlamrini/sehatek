@@ -29,44 +29,38 @@ const ProductCard = ({
 
   const handleToggle = () => {
     onToggle();
-    // Selecting a card reveals its options straight away; removing it closes
-    // the panel, since the card is about to disappear anyway.
     setIsOpen(!isSelected);
   };
 
   return (
     <article
       className={cn(
-        "flex flex-col overflow-hidden rounded-3xl border bg-white transition-all duration-200",
+        "group flex flex-col overflow-hidden rounded-3xl border bg-white transition-all duration-300",
         isSelected
-          ? "border-primary shadow-[0_18px_40px_rgba(229,135,48,0.18)]"
-          : "border-gray-200 shadow-sm hover:shadow-md",
+          ? "border-primary shadow-[0_20px_50px_rgba(229,135,48,0.2)]"
+          : "border-gray-200/80 shadow-[0_4px_20px_rgba(32,65,21,0.06)] hover:shadow-[0_16px_40px_rgba(32,65,21,0.12)] hover:-translate-y-1",
         locked && "opacity-70"
       )}
     >
-      {/* Photo — the card is mostly image */}
-
       <div
         onClick={() => onImageClick?.(product.image, product.name)}
-        className="group relative aspect-[4/3] w-full cursor-pointer overflow-hidden bg-gray-100"
+        className="group/img relative aspect-[4/3] w-full cursor-pointer overflow-hidden bg-gray-100"
       >
         <img
           src={product.image}
           alt={product.name}
           loading="lazy"
           className={cn(
-            "h-full w-full object-cover transition-transform duration-300 group-hover:scale-105",
+            "h-full w-full object-cover transition-transform duration-500 group-hover/img:scale-110",
             locked && "grayscale"
           )}
         />
 
-        <span className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
-
-        {/* Day badge, hanging on the bottom-left of the photo */}
+        <span className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover/img:opacity-100" />
 
         <span
           dir="rtl"
-          className="absolute bottom-3 left-3 rounded-full bg-forest px-3.5 py-1.5 text-xs font-extrabold uppercase tracking-wide text-white shadow-lg"
+          className="absolute bottom-3 left-3 rounded-full bg-forest/90 px-3.5 py-1.5 text-xs font-extrabold text-white backdrop-blur-sm"
         >
           {formatDay(mealDay)}
         </span>
@@ -84,13 +78,9 @@ const ProductCard = ({
           </span>
         ) : null}
 
-        {/* Selection toggle — a + that becomes a check once selected */}
-
         <button
           type="button"
           onClick={(event) => {
-            // The toggle sits inside the click-to-zoom wrapper: without this the
-            // click bubbles up and opens the image lightbox.
             event.stopPropagation();
             handleToggle();
           }}
@@ -98,7 +88,7 @@ const ProductCard = ({
           aria-pressed={isSelected}
           aria-label={isSelected ? `إزالة ${product.name}` : `إضافة ${product.name}`}
           className={cn(
-            "absolute bottom-3 right-3 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-white shadow-lg ring-4 ring-white transition-all duration-200 hover:scale-110",
+            "absolute bottom-3 right-3 flex h-12 w-12 cursor-pointer items-center justify-center rounded-full text-white shadow-lg ring-4 ring-white/80 transition-all duration-300 hover:scale-110 active:scale-95",
             isSelected
               ? "bg-leaf"
               : "bg-primary",
@@ -112,12 +102,10 @@ const ProductCard = ({
           )}
         </button>
 
-        <span className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/45 text-white opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100">
+        <span className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white opacity-0 backdrop-blur-sm transition-all duration-300 group-hover/img:opacity-100">
           <Maximize2 className="h-4 w-4" />
         </span>
       </div>
-
-      {/* Name + price */}
 
       <div className="flex flex-1 flex-col p-5">
         <h3 className="text-lg font-bold leading-snug text-forest">
@@ -173,7 +161,7 @@ const ProductCard = ({
                     value={note}
                     onChange={(event) => onNoteChange(event.target.value)}
                     maxLength={200}
-                    className="w-full rounded-lg border border-gray-200 p-2 text-xs outline-none focus:border-primary"
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-xs outline-none transition-all focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
               </div>

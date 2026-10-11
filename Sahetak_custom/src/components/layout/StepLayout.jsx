@@ -9,11 +9,11 @@ const StepLayout = ({ step = 1, onBack, title, subtitle, children }) => {
   const { itemsCount } = useOrder();
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
+    <div className="flex min-h-screen flex-col bg-cream">
       <SiteHeader itemsCount={itemsCount} />
 
       <div className="mx-auto w-full max-w-5xl px-4 pt-5">
-        <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-8">
+        <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-gray-100 sm:p-8">
           <OrderProgress current={step} onNavigate={onBack} />
         </div>
       </div>
@@ -25,19 +25,19 @@ const StepLayout = ({ step = 1, onBack, title, subtitle, children }) => {
               type="button"
               onClick={() => onBack(step - 1)}
               aria-label="رجوع"
-              className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-sm transition hover:border-primary hover:text-primary"
+              className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm transition hover:border-primary hover:text-primary"
             >
               <ArrowLeft className="h-4 w-4" />
             </button>
           ) : null}
 
           <div>
-            <h1 dir="rtl" className="text-xl font-extrabold text-forest">
+            <h1 dir="rtl" className="font-serif text-2xl font-semibold text-forest">
               {title}
             </h1>
 
             {subtitle ? (
-              <p dir="rtl" className="text-sm text-gray-400">
+              <p dir="rtl" className="mt-1 text-sm text-gray-400">
                 {subtitle}
               </p>
             ) : null}

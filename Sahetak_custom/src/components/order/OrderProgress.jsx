@@ -8,9 +8,8 @@ const OrderProgress = ({ current, onNavigate }) => {
 
   return (
     <div>
-      {/* Mobile */}
       <div className="sm:hidden">
-        <div className="mb-2 flex items-center justify-between text-sm">
+        <div className="mb-3 flex items-center justify-between text-sm">
           <span dir="rtl" className="font-bold text-forest">
             الخطوة {current + 1} من {total}
           </span>
@@ -20,15 +19,14 @@ const OrderProgress = ({ current, onNavigate }) => {
           </span>
         </div>
 
-        <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+        <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-200">
           <div
-            className="h-full rounded-full bg-primary transition-all duration-300"
+            className="h-full rounded-full bg-gradient-to-l from-primary to-leaf transition-all duration-500"
             style={{ width: `${((current + 1) / total) * 100}%` }}
           />
         </div>
       </div>
 
-      {/* Desktop */}
       <div className="hidden sm:block">
         <ol className="flex items-start">
           {STEPS.map((step, index) => {
@@ -43,15 +41,15 @@ const OrderProgress = ({ current, onNavigate }) => {
                   disabled={!clickable}
                   onClick={() => clickable && onNavigate(index)}
                   className={cn(
-                    "flex flex-col items-center gap-2",
+                    "group flex flex-col items-center gap-2",
                     clickable ? "cursor-pointer" : "cursor-default"
                   )}
                 >
                   <span
                     className={cn(
-                      "flex h-9 w-9 items-center justify-center rounded-full border text-sm font-bold transition",
-                      isDone && "border-leaf bg-leaf text-white",
-                      isActive && "border-primary bg-primary text-white",
+                      "flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-bold transition-all duration-300",
+                      isDone && "border-leaf bg-leaf text-white group-hover:scale-110",
+                      isActive && "border-primary bg-primary text-white ring-4 ring-primary/20",
                       !isDone && !isActive && "border-gray-300 bg-white text-gray-400"
                     )}
                   >
@@ -65,8 +63,8 @@ const OrderProgress = ({ current, onNavigate }) => {
                   <span
                     dir="rtl"
                     className={cn(
-                      "whitespace-nowrap text-sm font-semibold",
-                      isActive ? "text-forest" : "text-gray-400"
+                      "whitespace-nowrap text-sm font-semibold transition-colors",
+                      isActive ? "text-forest" : isDone ? "text-leaf" : "text-gray-400"
                     )}
                   >
                     {step.label}
@@ -76,7 +74,7 @@ const OrderProgress = ({ current, onNavigate }) => {
                 {index < total - 1 ? (
                   <span
                     className={cn(
-                      "mx-3 mt-[18px] h-0.5 flex-1 rounded",
+                      "mx-3 mt-[20px] h-0.5 flex-1 rounded-full transition-colors duration-300",
                       index < current ? "bg-leaf" : "bg-gray-200"
                     )}
                   />

@@ -31,11 +31,11 @@ const Faq = () => {
   const [openIndex, setOpenIndex] = useState(0);
 
   return (
-    <section dir="rtl" className="w-full bg-cream py-14 sm:py-20">
+    <section dir="rtl" className="w-full bg-white py-14 sm:py-20">
       <div className="mx-auto grid max-w-5xl gap-10 px-6 sm:px-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-16">
         <div className="lg:pt-2">
           <p className="text-xs font-extrabold tracking-[0.2em] text-primary">
-            نجيبو على أسئلتك
+            نجاوبو على أسئلتك
           </p>
 
           <h2 className="mt-4 text-4xl font-extrabold leading-tight text-forest sm:text-5xl">
@@ -46,12 +46,15 @@ const Faq = () => {
             كل ما تحتاج معرفته قبل ما تسجل طلبك.
           </p>
 
-          <img
-            src={FaqImage}
-            alt=""
-            aria-hidden="true"
-            className="mt-8 w-36 select-none sm:w-44"
-          />
+          <div className="mt-12 hidden lg:block">
+            {/* تم تبسيط الصورة وإزالة الخلفية والظل */}
+            <img
+              src={FaqImage}
+              alt="الأسئلة الشائعة"
+              aria-hidden="true"
+              className="w-72 object-contain"
+            />
+          </div>
         </div>
 
         <ul className="space-y-4">
@@ -62,10 +65,10 @@ const Faq = () => {
               <li key={item.q}>
                 <div
                   className={cn(
-                    "rounded-2xl border px-5 py-5 transition-colors duration-200 sm:px-6",
+                    "rounded-2xl border px-5 py-5 transition-all duration-300 sm:px-6",
                     open
-                      ? "border-primary bg-white shadow-[0_10px_30px_rgba(32,65,21,0.08)]"
-                      : "border-forest/10 bg-white/70 hover:border-forest/25"
+                      ? "border-primary bg-white shadow-[0_10px_30px_rgba(229,135,48,0.12)]"
+                      : "border-gray-200 bg-gray-50/50 hover:border-forest/25 hover:bg-white"
                   )}
                 >
                   <button
@@ -84,9 +87,9 @@ const Faq = () => {
 
                     <span
                       className={cn(
-                        "flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors",
+                        "flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all duration-300",
                         open
-                          ? "bg-primary text-white"
+                          ? "bg-primary text-white rotate-180"
                           : "border border-forest/20 text-forest/70"
                       )}
                     >
