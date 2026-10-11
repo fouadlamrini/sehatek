@@ -18,7 +18,7 @@ const StepLayout = ({ step = 1, onBack, title, subtitle, children }) => {
         </div>
       </div>
 
-      <main className="mx-auto w-full max-w-2xl flex-1 px-4 pt-6">
+      <main className="mx-auto w-full max-w-2xl flex-1 px-4 pt-6 pb-12">
         <div className="mb-5 flex items-center gap-3">
           {onBack ? (
             <button

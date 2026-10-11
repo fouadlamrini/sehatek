@@ -16,7 +16,11 @@ import { cn } from "../utils/cn";
 const DeliveryInfo = () => {
   const navigate = useNavigate();
   const { items, customer, delivery, setDelivery } = useOrder();
-  const { cities, loading: citiesLoading } = useCities();
+  const {
+    cities,
+    loading: citiesLoading,
+    error: citiesError,
+  } = useCities();
 
   const [form, setForm] = useState(delivery);
   const [errors, setErrors] = useState({});
@@ -85,7 +89,9 @@ const DeliveryInfo = () => {
             placeholder={
               citiesLoading
                 ? "جارٍ تحميل المدن..."
-                : "ما كايناش مدن متوفرة حالياً"
+                : cities.length > 0
+                  ? "اختار مدينتك"
+                  : "ماكايناش مدن متوفرة حاليا"
             }
           >
             {cities.map((city) => (
@@ -95,9 +101,9 @@ const DeliveryInfo = () => {
             ))}
           </Select>
 
-          {!citiesLoading && cities.length === 0 ? (
-            <p className="-mt-2 text-xs text-gray-400">
-              ما كاين حتى مدينة متوفرة دابا. تواصل معانا باش نزيدوها.
+          {citiesError ? (
+            <p role="alert" className="-mt-2 text-xs text-red-600">
+              {citiesError}
             </p>
           ) : null}
 
