@@ -1,11 +1,10 @@
 export const formatCurrency = (value) => {
   const number = Number(value);
+  const amount = Number.isNaN(number)
+    ? "0"
+    : number.toFixed(2).replace(/\.00$/, "");
 
-  if (Number.isNaN(number)) {
-    return "0 DH";
-  }
-
-  return `${number.toFixed(2).replace(/\.00$/, "")} DH`;
+  return `\u2066${amount} DH\u2069`;
 };
 
 // The API stores meal days as French labels, so they have to be translated for

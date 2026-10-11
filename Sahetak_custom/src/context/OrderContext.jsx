@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -9,11 +10,43 @@ import {
 import { MAX_ITEM_QUANTITY } from "../constants";
 
 const OrderContext = createContext(null);
+const CART_STORAGE_KEY = "sehatek:cart:v1";
 
 const buildKey = (productId, mealDay) => `${productId}__${mealDay}`;
 
+const loadCart = () => {
+  if (typeof window === "undefined") {
+    return [];
+  }
+
+  try {
+    const storedCart = window.localStorage.getItem(CART_STORAGE_KEY);
+
+    if (!storedCart) {
+      return [];
+    }
+
+    const items = JSON.parse(storedCart);
+    return Array.isArray(items)
+      ? items.filter(
+          (item) =>
+            item &&
+            typeof item.key === "string" &&
+            typeof item.productId === "string" &&
+            typeof item.name === "string" &&
+            typeof item.note === "string" &&
+            Number.isFinite(Number(item.quantity)) &&
+            Number(item.quantity) >= 1
+        )
+      : [];
+  } catch (error) {
+    console.error("تعذر استرجاع السلة من التخزين المحلي.", error);
+    return [];
+  }
+};
+
 export const OrderProvider = ({ children }) => {
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState(loadCart);
   const [customer, setCustomer] = useState({
     name: "",
     phone: "",
@@ -25,6 +58,22 @@ export const OrderProvider = ({ children }) => {
     receiverName: "",
   });
   const [submittedOrder, setSubmittedOrder] = useState(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    try {
+      if (items.length === 0) {
+        window.localStorage.removeItem(CART_STORAGE_KEY);
+      } else {
+        window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+      }
+    } catch (error) {
+      console.error("تعذر حفظ السلة في التخزين المحلي.", error);
+    }
+  }, [items]);
 
   const addItem = useCallback((product, mealDay) => {
     const key = buildKey(product._id, mealDay);
@@ -93,7 +142,7 @@ export const OrderProvider = ({ children }) => {
       }
 
       let max = MAX_ITEM_QUANTITY;
-      const stock = Number(target.stock);
+      const stock = target.stock == null ? NaN : Number(target.stock);
 
       if (Number.isFinite(stock)) {
         const usedElsewhere = current

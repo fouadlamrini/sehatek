@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowUp } from "lucide-react";
 
 const QUICK_LINKS = [
-  { label: "الفائمة", to: "/#menu" },
+  { label: "القائمة", to: "/#menu" },
   { label: "تابع طلبك", to: "/track" },
   { label: "من نحن", to: "/about" },
   { label: "اتصل بنا", to: "/contact" },

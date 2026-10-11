@@ -30,13 +30,7 @@ export const buildOrderMessage = (items, customer, delivery, order) => {
   }
   lines.push("");
 
-  if (order?.discount > 0) {
-    lines.push(`🎁 الخصم: -${order.discount} DH`);
-  }
-
-  if (order?.totalPrice !== undefined) {
-    lines.push(`💰 المجموع: ${order.totalPrice} DH`);
-  }
+  
 
   lines.push("");
   lines.push("👤 الزبون:");

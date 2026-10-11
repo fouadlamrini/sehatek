@@ -7,7 +7,11 @@ import SiteFooter from "../components/layout/SiteFooter";
 
 import { useOrder } from "../context/OrderContext";
 import { formatCurrency } from "../utils/formatters";
-import { getOrderReference, buildOrderMessage, buildWhatsappUrl } from "../utils/whatsapp";
+import {
+  getOrderReference,
+  buildOrderMessage,
+  buildWhatsappUrl,
+} from "../utils/whatsapp";
 
 const OrderSuccess = () => {
   const navigate = useNavigate();
@@ -25,7 +29,7 @@ const OrderSuccess = () => {
 
   const reference = getOrderReference(submittedOrder);
   const whatsappUrl = buildWhatsappUrl(
-    buildOrderMessage(items, customer, delivery, submittedOrder)
+    buildOrderMessage(items, customer, delivery, submittedOrder),
   );
 
   const handleNewOrder = () => {
@@ -45,7 +49,10 @@ const OrderSuccess = () => {
             </div>
           </div>
 
-          <h1 dir="rtl" className="mt-5 text-center font-serif text-3xl font-semibold text-forest">
+          <h1
+            dir="rtl"
+            className="mt-5 text-center font-serif text-3xl font-semibold text-forest"
+          >
             تم إرسال الطلب ديالك!
           </h1>
 
@@ -54,15 +61,21 @@ const OrderSuccess = () => {
             {reference ? (
               <span className="font-bold text-primary"> {reference}</span>
             ) : null}
-            . ريقنا غادي يتواصلو معاك لتأكيد الطلب.
+            . الفريق ديالنا غادي يتواصلو معاك لتأكيد الطلب.
           </p>
 
           {reference ? (
             <div className="mt-5 rounded-2xl border-2 border-dashed border-primary/30 bg-primary-soft/50 p-5 text-center">
-              <p dir="rtl" className="text-xs font-bold uppercase tracking-widest text-primary">
+              <p
+                dir="rtl"
+                className="text-xs font-bold uppercase tracking-widest text-primary"
+              >
                 كود التتبع
               </p>
-              <p dir="ltr" className="mt-1 select-all font-mono text-xl font-extrabold tracking-widest text-forest">
+              <p
+                dir="ltr"
+                className="mt-1 select-all font-mono text-xl font-extrabold tracking-widest text-forest"
+              >
                 {reference}
               </p>
               <p dir="rtl" className="mt-1 text-xs text-gray-500">
@@ -109,7 +122,7 @@ const OrderSuccess = () => {
               type="button"
               onClick={() =>
                 navigate(
-                  `/track?code=${encodeURIComponent(submittedOrder.trackingCode)}`
+                  `/track?code=${encodeURIComponent(submittedOrder.trackingCode)}`,
                 )
               }
               className="mt-3 flex h-13 w-full items-center justify-center gap-2 rounded-2xl border-2 border-gray-200 bg-white text-base font-bold text-forest transition hover:border-primary hover:text-primary"

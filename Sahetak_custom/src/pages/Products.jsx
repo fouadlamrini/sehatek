@@ -225,7 +225,7 @@ const Testimonials = () => (
           آراء الزبناء
         </p>
         <h2 className="mt-3 font-serif text-3xl font-semibold text-forest sm:text-4xl">
-          زبنائنا كايتقالو
+          زبنائنا كايقولو
         </h2>
       </div>
 
